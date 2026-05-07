@@ -1,124 +1,93 @@
-<img width="1423" height="803" alt="Screenshot 2026-04-01 at 11 46 28 PM" src="https://github.com/user-attachments/assets/6cbfa8cd-97bb-45aa-b4ed-7df4be671166" />
+<img width="1423" height="803" alt="Screenshot 2026-04-01 at 11 46 28 PM" src="https://github.com/user-attachments/assets/71331b9c-c8a1-4c51-a269-6619bf26329c" />
 
-Production-style personal portfolio with an integrated recruiter assistant named **Xeno AI Assistant**.
+# Personal Portfolio - Abhiram Thallapally
 
-## Files
+![Portfolio](https://img.shields.io/badge/Portfolio-Live-blue?style=for-the-badge)
+![HTML](https://img.shields.io/badge/HTML5-Structure-orange?style=for-the-badge&logo=html5)
+![CSS](https://img.shields.io/badge/CSS3-Styling-blue?style=for-the-badge&logo=css3)
+![JavaScript](https://img.shields.io/badge/JavaScript-Logic-yellow?style=for-the-badge&logo=javascript)
 
-- `index.html` - main portfolio, resume snapshot, projects, contact, and Xeno widget markup
-- `style.css` - portfolio UI, responsive layout, glassmorphism assistant styles
-- `app.js` - portfolio interactions, project/certificate filters, Xeno chat logic, voice input/output
-- `CV_Abhiram.pdf` - downloadable resume
-- `xeno-assistant.html` - standalone and embedded Xeno assistant experience
+---
 
-<img width="1423" height="803" alt="Screenshot 2026-04-01 at 11 46 39 PM" src="https://github.com/user-attachments/assets/967ca17e-60f9-46e7-9c3d-e63d4250dfc8" />
+## About Me
 
-# Abhiram Thallapally Portfolio
-<img width="1434" height="696" alt="Screenshot 2026-05-07 at 6 41 15 PM" src="https://github.com/user-attachments/assets/434053fb-b704-4ac5-8d77-f733fb1daaf2" />
+I am a **Computer Science graduate (AI & ML)** and an aspiring **AI/ML Engineer & Full-Stack Developer**.  
+This portfolio showcases my ability to build **end-to-end applications** - from machine learning models to user-friendly web interfaces.
+
+I focus on:
+- Clean and scalable code
+- Real-world problem solving
+- Building impactful, user-centric applications
+
+---
 
 ## Features
 
-- Responsive dark portfolio UI
-- Resume snapshot with skills, projects, education, and certifications
-- Download Resume button
-- Filterable project and certificate sections
-- Floating **Xeno AI Assistant** button
-- Pure HTML/CSS animated robot mascot that acts as the Xeno trigger
-- Expandable glassmorphism chat panel
-- Local resume-trained answers for recruiter questions
-- Quick prompts:
-  - Summarize my profile
-  - Give interview pitch
-  - Explain AI projects
-- Speech-to-text microphone input using the Web Speech API
-- Text-to-speech responses with female/male voice selection
-- Chat history saved in `localStorage`
-- Clear chat button
-- Enter key to send
-- API fallback: Xeno works locally when no API key is configured
+- Modern and responsive UI/UX design
+- Dark-themed custom design system
+- Smooth animations using Intersection Observer
+- Project showcase with live demos and GitHub links
+- AI/ML + Full-stack integration
+- Certificate filtering system
+- Fully responsive (mobile, tablet, desktop)
+- Downloadable CV and direct contact options
 
-## Robot Mascot Integration
+---
 
-<img width="1423" height="803" alt="Screenshot 2026-04-01 at 11 47 07 PM" src="https://github.com/user-attachments/assets/c93df568-11e9-4d9a-b908-08f6fd35619a" />
+## Tech Stack
 
-The Xeno robot is built with div/span-style HTML inside the `data-xeno-toggle` button in `index.html`.
+### Frontend
+- HTML5
+- CSS3
+- JavaScript (ES6)
 
-Related files:
+### Concepts Used
+- Responsive Web Design
+- DOM Manipulation
+- Intersection Observer API
+- Component-based UI structure
 
-- Markup: `index.html`, inside the `xeno-launcher` button
-- Styling and keyframes: `style.css`, under `XENO AI ASSISTANT`
-- State logic: `app.js`, inside `initChat()`
+---
+<img width="1434" height="696" alt="Screenshot 2026-05-07 at 6 48 11 PM" src="https://github.com/user-attachments/assets/e1291dd6-ea64-4371-96e8-43778e800996" />
 
-Animation states:
+## Projects Highlighted
 
-- `is-open` - waves when the chat opens
-- `is-reacting` - bounce/glow when the user sends a message or opens Xeno
-- `is-thinking` - neon core pulse while Xeno prepares a response
-- `is-talking` - animated mouth and waveform while speech output plays
+### Thyroid Disease Prediction System
+- Machine Learning model with **90%+ accuracy**
+- Built using Python, Scikit-learn, Pandas, NumPy
+- Interactive UI for predictions
 
-No external images or libraries are used.
+### Interactive Budgeting Tool
+- Full-stack application (Java + Spring Boot + React + MySQL)
+- Expense tracking and visualization
+- JWT-based authentication
 
-## Xeno AI Assistant Knowledge
+### Personal Portfolio Website
+- Fully responsive custom portfolio
+- Built with pure HTML, CSS, and JavaScript
+- Fast and lightweight (no frameworks)
 
-Xeno answers from Abhiram's portfolio and resume content:
+### Financial Calculator Web App
+- Calculates FD, EMI, SIP
+- Real-time updates with interactive UI
+- Fully client-side (no backend required)
 
-- Skills: Python, Java, JavaScript, SQL, AI/ML, full-stack development, data visualization, tools
-- Projects: thyroid disease prediction, budgeting tool, portfolio, weather dashboard, GitHub analyzer, financial calculator, ML demos, JavaScript demos
-- Certifications: AWS Cloud Foundations, AWS Machine Learning Foundations, Full Stack Development, Cyber Security Audits
-- Education: Computer Science, Artificial Intelligence and Machine Learning, 2025
-- Contact: email, phone, GitHub, LinkedIn
-<img width="1423" height="803" alt="Screenshot 2026-04-01 at 11 47 07 PM" src="https://github.com/user-attachments/assets/784f5670-a257-43ec-877a-8f4b68014764" />
-## Setup
+---
 
-Open `index.html` directly in a browser, or serve the folder locally:
+## Portfolio Highlights
 
-```bash
-python3 -m http.server 8000
-```
+| Feature | Value |
+| --- | --- |
+| Projects | 15 |
+| Certifications | 6 |
+| ML Accuracy | 90%+ |
+| Graduation | 2025 |
 
-Then visit:
+---
 
-```text
-http://localhost:8000
-```
+## Preview
 
-## Optional API Integration
+<img width="1423" height="803" alt="Screenshot 2026-04-01 at 11 46 39 PM" src="https://github.com/user-attachments/assets/5f4026f5-b510-4bd6-bf45-8a189ebfcfa3" />
 
-Xeno currently uses the built-in local knowledge base in `app.js`, so it works without a key.
-
-For Typecast text-to-speech audio generation, use the Node helper:
-
-```bash
-TYPECAST_API_KEY=your_key node scripts/typecast-tts.mjs
-```
-
-This writes `typecast.wav` locally. Keep `TYPECAST_API_KEY` server-side; do not place it in browser JavaScript.
-
-To connect a hosted AI API, update `XENO_CONFIG` in `app.js`:
-
-```js
-const XENO_CONFIG = {
-  apiKey: "YOUR_API_KEY",
-  apiEndpoint: "https://your-api.example.com/xeno"
-};
-```
-
-Expected API response:
-
-```json
-{
-  "reply": "Assistant response text"
-}
-```
-
-If the API key or endpoint is missing, or if the request fails, Xeno automatically falls back to local portfolio responses.
-
-## Voice Notes
-
-- Speech-to-text depends on browser support for `SpeechRecognition` or `webkitSpeechRecognition`.
-- Text-to-speech depends on `speechSynthesis`.
-- Female voice is selected by default.
-- Users can switch between Female and Male voice in the assistant toolbar.
-- If microphone permission is blocked or unsupported, typed chat continues to work.
-<img width="1423" height="803" alt="Screenshot 2026-04-01 at 11 48 04 PM" src="https://github.com/user-attachments/assets/775c19bb-9d7f-44ed-9e9d-f1daffb321b6" />
-<img width="1423" height="803" alt="Screenshot 2026-04-01 at 11 47 43 PM" src="https://github.com/user-attachments/assets/39a70d91-7858-4d5f-a99c-cd1821f253ca" />
-
+<img width="1423" height="803" alt="Screenshot 2026-04-01 at 11 47 16 PM" src="https://github.com/user-attachments/assets/c456a1f5-4ab7-4e32-b8a2-e704515e7274" />
+<img width="1423" height="803" alt="Screenshot 2026-04-01 at 11 47 43 PM" src="https://github.com/user-attachments/assets/df36f6ca-6fc8-4776-a1b0-d62496c8d020" /><img width="1423" height="803" alt="Screenshot 2026-04-01 at 11 47 31 PM" src="https://github.com/user-attachments/assets/69c5e050-b6ae-44d8-bb6d-fe0375fc397d" /><img width="1423" height="803" alt="Screenshot 2026-04-01 at 11 47 07 PM" src="https://github.com/user-attachments/assets/2bfe296c-8d70-4fce-a239-2f89f205ed03" />
