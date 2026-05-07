@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Movie Recommendation System thumbnail</title>
+  <desc id="desc">Movie recommender interface with streaming cards and similarity score graph.</desc>
+  <rect width="1200" height="720" fill="#170f1f"/>
+  <text x="118" y="128" fill="#f8fafc" font-family="Arial" font-size="50" font-weight="800">Movie Recommender</text>
+  <g transform="translate(130 180)"><rect width="190" height="280" rx="24" fill="#ef4444"/><rect x="230" width="190" height="280" rx="24" fill="#f59e0b"/><rect x="460" width="190" height="280" rx="24" fill="#38bdf8"/><rect x="690" width="190" height="280" rx="24" fill="#8b5cf6"/></g>
+  <g fill="#fff" opacity=".82"><circle cx="225" cy="270" r="34"/><circle cx="455" cy="270" r="34"/><circle cx="685" cy="270" r="34"/><circle cx="915" cy="270" r="34"/></g>
+  <rect x="168" y="520" width="864" height="70" rx="35" fill="#0f172a"/><rect x="168" y="520" width="640" height="70" rx="35" fill="#38bdf8"/><text x="206" y="566" fill="#07111f" font-family="Arial" font-size="30" font-weight="800">Similarity match: 86%</text>
+</svg>

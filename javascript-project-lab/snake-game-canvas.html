@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game Canvas</title>
+  <link rel="stylesheet" href="./demo-style.css">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="shell nav">
+      <a class="brand" href="../abhiram_portfolio.html#projects">Abhiram Portfolio</a>
+
+    </div>
+  </header>
+  <main class="shell">
+    <section class="hero">
+      <h1>Snake Game Canvas</h1>
+      <p>Use arrow keys, WASD, or the direction controls. Eat food, grow longer, and avoid collisions.</p>
+    </section>
+    <section class="demo-grid">
+      <div class="panel">
+        <canvas id="snakeCanvas" width="420" height="420"></canvas>
+        <div class="dpad" aria-label="Snake touch controls">
+          <span class="empty"></span><button class="btn" data-dir="up">Up</button><span class="empty"></span>
+          <button class="btn" data-dir="left">Left</button><button class="btn" data-dir="down">Down</button><button
+            class="btn" data-dir="right">Right</button>
+        </div>
+      </div>
+      <aside class="panel">
+        <div class="metrics">
+          <div class="metric"><strong id="snakeScore">0</strong><span>score</span></div>
+          <div class="metric"><strong id="snakeBest">0</strong><span>best</span></div>
+          <div class="metric"><strong id="snakeSpeed">7</strong><span>speed</span></div>
+        </div>
+        <p class="muted" id="snakeStatus">Press Start to begin.</p>
+        <div class="controls">
+          <button class="btn primary" id="startSnake">Start</button>
+          <button class="btn" id="pauseSnake">Pause</button>
+        </div>
+      </aside>
+    </section>
+  </main>
+  <footer class="shell"><a href="../abhiram_portfolio.html#projects">Back to portfolio projects</a></footer>
+  <script>
+    const snakeCanvas = document.getElementById("snakeCanvas");
+    const snakeCtx = snakeCanvas.getContext("2d");
+    let snake, food, dir, nextDir, snakeLoop, snakeScore = 0, snakeBest = 0, snakeRunning = false;
+    function resetSnake() {
+      snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
+      food = { x: 15, y: 12 }; dir = { x: 1, y: 0 }; nextDir = dir; snakeScore = 0;
+      drawSnake();
+    }
+    function drawSnake() {
+      const size = 21;
+      snakeCtx.fillStyle = "#07101e"; snakeCtx.fillRect(0, 0, 420, 420);
+      snakeCtx.fillStyle = "#34d399";
+      snake.forEach(part => snakeCtx.fillRect(part.x * size + 2, part.y * size + 2, size - 4, size - 4));
+      snakeCtx.fillStyle = "#f97316";
+      snakeCtx.fillRect(food.x * size + 3, food.y * size + 3, size - 6, size - 6);
+      document.getElementById("snakeScore").textContent = snakeScore;
+      document.getElementById("snakeBest").textContent = snakeBest;
+    }
+    function stepSnake() {
+      dir = nextDir;
+      const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+      const hit = head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || snake.some(p => p.x === head.x && p.y === head.y);
+      if (hit) {
+        clearInterval(snakeLoop); snakeRunning = false;
+        document.getElementById("snakeStatus").textContent = "Game over. Press Start to retry.";
+        snakeBest = Math.max(snakeBest, snakeScore);
+        drawSnake();
+        return;
+      }
+      snake.unshift(head);
+      if (head.x === food.x && head.y === food.y) {
+        snakeScore += 10;
+        food = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
+      } else {
+        snake.pop();
+      }
+      drawSnake();
+    }
+    function setSnakeDir(name) {
+      const dirs = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
+      const chosen = dirs[name];
+      if (chosen && chosen.x !== -dir.x && chosen.y !== -dir.y) nextDir = chosen;
+    }
+    document.getElementById("startSnake").onclick = () => {
+      if (!snakeRunning) { resetSnake(); snakeLoop = setInterval(stepSnake, 140); snakeRunning = true; document.getElementById("snakeStatus").textContent = "Running."; }
+    };
+    document.getElementById("pauseSnake").onclick = () => {
+      if (snakeRunning) { clearInterval(snakeLoop); snakeRunning = false; document.getElementById("snakeStatus").textContent = "Paused."; }
+    };
+    document.querySelectorAll("[data-dir]").forEach(btn => btn.onclick = () => setSnakeDir(btn.dataset.dir));
+    window.addEventListener("keydown", e => {
+      const map = { ArrowUp: "up", w: "up", ArrowDown: "down", s: "down", ArrowLeft: "left", a: "left", ArrowRight: "right", d: "right" };
+      if (map[e.key]) setSnakeDir(map[e.key]);
+    });
+    resetSnake();
+  </script>
+</body>
+
+</html>

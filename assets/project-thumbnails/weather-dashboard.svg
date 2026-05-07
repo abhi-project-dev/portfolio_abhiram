@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Weather Dashboard thumbnail</title>
+  <desc id="desc">Weather app illustration with sun, cloud, forecast cards, and temperature graph.</desc>
+  <defs><linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#082f49"/><stop offset="1" stop-color="#155e75"/></linearGradient></defs>
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <circle cx="256" cy="210" r="92" fill="#fbbf24"/><g fill="#e0f2fe"><ellipse cx="354" cy="255" rx="118" ry="58"/><ellipse cx="250" cy="270" rx="86" ry="44"/><ellipse cx="432" cy="280" rx="86" ry="42"/></g>
+  <rect x="112" y="390" width="976" height="202" rx="34" fill="#07111f" opacity=".86" stroke="#7dd3fc" stroke-opacity=".28"/>
+  <text x="144" y="456" fill="#f8fafc" font-family="Arial" font-size="42" font-weight="800">7-Day Weather API</text>
+  <path d="M154 538c80-70 133-12 204-58 88-57 145 13 226-34 83-48 160 12 246-44 55-36 110-28 202 26" fill="none" stroke="#67e8f9" stroke-width="16" stroke-linecap="round"/>
+  <g fill="#bae6fd"><rect x="650" y="146" width="92" height="142" rx="22"/><rect x="770" y="184" width="92" height="104" rx="22"/><rect x="890" y="112" width="92" height="176" rx="22"/></g>
+</svg>

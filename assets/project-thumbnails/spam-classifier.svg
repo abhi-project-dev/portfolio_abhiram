@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Spam Email Classifier thumbnail</title>
+  <desc id="desc">NLP classifier interface sorting email into safe and spam categories.</desc>
+  <rect width="1200" height="720" fill="#111827"/>
+  <rect x="118" y="104" width="964" height="512" rx="38" fill="#f8fafc"/>
+  <rect x="118" y="104" width="964" height="84" rx="38" fill="#0f172a"/><text x="170" y="158" fill="#f8fafc" font-family="Arial" font-size="40" font-weight="800">Spam Email Classifier</text>
+  <g fill="#e5e7eb"><rect x="180" y="248" width="480" height="70" rx="18"/><rect x="180" y="350" width="480" height="70" rx="18"/><rect x="180" y="452" width="480" height="70" rx="18"/></g>
+  <g font-family="Arial" font-size="28" font-weight="800"><text x="712" y="300" fill="#16a34a">SAFE</text><text x="712" y="402" fill="#dc2626">SPAM</text><text x="712" y="504" fill="#16a34a">SAFE</text></g>
+  <rect x="846" y="236" width="150" height="300" rx="32" fill="#111827"/><text x="884" y="340" fill="#38bdf8" font-family="Arial" font-size="32" font-weight="800">NLP</text><text x="878" y="430" fill="#f8fafc" font-family="Arial" font-size="48" font-weight="800">97%</text>
+</svg>

@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xeno AI Assistant</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05070d;
+      --panel: rgba(11, 18, 32, .9);
+      --card: rgba(255,255,255,.055);
+      --line: rgba(255,255,255,.12);
+      --text: #f7f9ff;
+      --muted: #9ba8bd;
+      --cyan: #67e8ff;
+      --blue: #5b8cff;
+      --violet: #9274ff;
+      --green: #5dffc9;
+      --danger: #ff6b9d;
+      --shadow: 0 28px 80px rgba(0,0,0,.45);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; color: var(--text); overflow: hidden; }
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 14% 10%, rgba(103,232,255,.15), transparent 30rem),
+        radial-gradient(circle at 88% 16%, rgba(146,116,255,.16), transparent 28rem),
+        var(--bg);
+    }
+    html.is-embedded, html.is-embedded body { width: 100%; height: 100%; background: transparent !important; }
+    html.is-embedded .demo-page { display: none; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .demo-page { min-height: 100vh; display: grid; place-items: center; padding: 2rem; text-align: center; }
+    .demo-card { width: min(760px, 100%); border: 1px solid var(--line); border-radius: 28px; padding: clamp(1.5rem, 5vw, 3rem); background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.03)); box-shadow: var(--shadow); backdrop-filter: blur(24px); }
+    .demo-card h1 { margin: 0; font-size: clamp(2.2rem, 7vw, 4.8rem); line-height: .95; letter-spacing: -.04em; }
+    .demo-card p { max-width: 56ch; margin: 1rem auto 0; color: var(--muted); line-height: 1.7; }
+    .demo-card button { margin-top: 1.2rem; border: 1px solid rgba(103,232,255,.34); border-radius: 999px; padding: .8rem 1.1rem; background: rgba(103,232,255,.12); color: var(--text); font-weight: 800; }
+    .xeno-shell { position: fixed; right: 1rem; bottom: 1rem; z-index: 20; display: flex; flex-direction: column; align-items: flex-end; gap: .85rem; }
+    html.is-embedded .xeno-shell { right: .5rem; bottom: .5rem; }
+    .xeno-panel { width: min(430px, calc(100vw - 1rem)); height: min(690px, calc(100vh - 1rem)); display: grid; grid-template-rows: auto auto minmax(0,1fr) auto auto; overflow: hidden; border: 1px solid var(--line); border-radius: 24px; background: radial-gradient(circle at 18% 0%, rgba(103,232,255,.14), transparent 18rem), linear-gradient(145deg, rgba(255,255,255,.09), rgba(255,255,255,.035)), var(--panel); box-shadow: var(--shadow), 0 0 44px rgba(103,232,255,.12); backdrop-filter: blur(24px); opacity: 0; transform: translateY(14px) scale(.96); pointer-events: none; transition: opacity 220ms ease, transform 220ms ease; }
+    .xeno-shell.is-open .xeno-panel { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+    .xeno-header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .8rem; padding: 1rem; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.045); }
+    .xeno-avatar { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid rgba(103,232,255,.34); border-radius: 14px; background: linear-gradient(135deg, rgba(103,232,255,.18), rgba(146,116,255,.16)); box-shadow: 0 0 22px rgba(103,232,255,.18); font-weight: 900; }
+    .xeno-header h2 { margin: 0; font-size: .98rem; }
+    .xeno-status { display: inline-flex; align-items: center; gap: .35rem; margin-top: .14rem; color: var(--green); font-size: .76rem; font-weight: 700; }
+    .xeno-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 14px var(--green); }
+    .xeno-toolbar { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .75rem 1rem; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .xeno-voice { display: flex; align-items: center; gap: .5rem; color: var(--muted); font-size: .82rem; font-weight: 800; }
+    .xeno-voice select, .xeno-composer input { border: 1px solid var(--line); background: rgba(7,12,24,.78); color: var(--text); outline: none; }
+    .xeno-voice select { min-height: 36px; border-radius: 999px; padding: .25rem .7rem; }
+    .xeno-clear, .xeno-icon, .xeno-mic, .xeno-send, .xeno-prompt { border: 1px solid var(--line); color: var(--text); transition: transform 160ms ease, border-color 160ms ease, background 160ms ease; }
+    .xeno-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.06); font-size: 1.2rem; }
+    .xeno-clear { min-height: 36px; border-radius: 999px; background: rgba(255,255,255,.045); padding: 0 .75rem; font-size: .78rem; font-weight: 800; }
+    .xeno-preview {
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(103,232,255,.08);
+      color: var(--text);
+      padding: 0 .75rem;
+      font-size: .78rem;
+      font-weight: 800;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+    .xeno-preview:hover {
+      transform: translateY(-1px);
+      border-color: rgba(103,232,255,.45);
+      background: rgba(103,232,255,.14);
+    }
+    .xeno-voice-audio {
+      display: none;
+    }
+    .xeno-messages { display: flex; flex-direction: column; gap: .75rem; padding: 1rem; overflow-y: auto; scroll-behavior: smooth; }
+    .xeno-message { max-width: 88%; padding: .78rem .9rem; border-radius: 18px; line-height: 1.52; font-size: .93rem; white-space: pre-line; animation: messageIn 180ms ease both; }
+    .xeno-message.assistant { align-self: flex-start; border-top-left-radius: 6px; border: 1px solid rgba(93,255,201,.3); background: var(--card); color: #d8e2f3; }
+    .xeno-message.user { align-self: flex-end; border-top-right-radius: 6px; border: 1px solid rgba(103,232,255,.38); background: rgba(91,140,255,.2); color: #fff; font-weight: 700; }
+    @keyframes messageIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+    .typing-dots { display: inline-flex; gap: .24rem; align-items: center; }
+    .typing-dots i { width: .4rem; height: .4rem; border-radius: 50%; background: var(--cyan); animation: typingDot 900ms ease-in-out infinite; }
+    .typing-dots i:nth-child(2) { animation-delay: 120ms; } .typing-dots i:nth-child(3) { animation-delay: 240ms; }
+    @keyframes typingDot { 0%,100% { opacity: .35; transform: scale(.86); } 50% { opacity: 1; transform: scale(1.2); } }
+    .xeno-prompts { display: flex; gap: .5rem; overflow-x: auto; padding: 0 1rem .8rem; }
+    .xeno-prompt { flex: 0 0 auto; min-height: 34px; border-radius: 999px; background: rgba(255,255,255,.045); padding: 0 .72rem; font-size: .77rem; font-weight: 800; }
+    .xeno-composer { display: grid; grid-template-columns: auto 1fr auto; gap: .55rem; padding: .85rem 1rem 1rem; border-top: 1px solid var(--line); }
+    .xeno-composer input { min-width: 0; min-height: 44px; border-radius: 999px; padding: .68rem .95rem; }
+    .xeno-composer input:focus { border-color: rgba(103,232,255,.55); box-shadow: 0 0 0 4px rgba(103,232,255,.1); }
+    .xeno-mic, .xeno-send { min-width: 44px; min-height: 44px; border-radius: 50%; background: rgba(255,255,255,.06); font-weight: 900; }
+    .xeno-send { background: linear-gradient(135deg, var(--cyan), var(--green)); color: #03111d; border-color: transparent; }
+    .xeno-mic.is-listening { background: rgba(255,107,157,.18); border-color: rgba(255,107,157,.55); box-shadow: 0 0 0 6px rgba(255,107,157,.12); animation: micPulse 780ms ease-in-out infinite alternate; }
+    @keyframes micPulse { to { transform: scale(1.05); } }
+    .xeno-prompt:hover, .xeno-icon:hover, .xeno-clear:hover, .xeno-mic:hover, .xeno-send:hover { transform: translateY(-1px); border-color: rgba(103,232,255,.45); background: rgba(103,232,255,.12); }
+    .xeno-launcher { position: relative; width: 112px; height: 124px; display: grid; place-items: center; border: 0; background: transparent; color: var(--text); }
+    .xeno-tooltip { position: absolute; right: calc(100% - 8px); top: 18px; width: max-content; max-width: 190px; padding: .48rem .74rem; border: 1px solid var(--line); border-radius: 999px; background: rgba(8,14,26,.92); box-shadow: 0 14px 38px rgba(0,0,0,.34); color: var(--text); font-size: .78rem; font-weight: 800; opacity: 0; transform: translateX(8px); pointer-events: none; transition: opacity 180ms ease, transform 180ms ease; white-space: nowrap; }
+    .xeno-launcher:hover .xeno-tooltip, .xeno-shell.is-open .xeno-tooltip { opacity: 1; transform: translateX(0); }
+    .xeno-shell.is-open .xeno-launcher {
+      position: absolute;
+      right: .65rem;
+      bottom: .55rem;
+      width: 78px;
+      height: 88px;
+      transform: scale(.78);
+      transform-origin: 100% 100%;
+      z-index: 2;
+    }
+    .xeno-shell.is-open .xeno-tooltip {
+      display: none;
+    }
+    .xeno-shell.is-open .xeno-composer {
+      padding-right: 5.8rem;
+    }
+    .robot { position: relative; width: 86px; height: 104px; display: grid; justify-items: center; animation: robotFloat 4.2s ease-in-out infinite; filter: drop-shadow(0 18px 28px rgba(0,0,0,.46)); }
+    .xeno-launcher:hover .robot { animation: robotHover 500ms ease, robotFloat 4.2s ease-in-out infinite 500ms; }
+    .xeno-shell.is-thinking .robot-eye { transform: translateX(4px) scaleY(.75); }
+    .xeno-shell.is-speaking .robot, .xeno-shell.is-listening .robot { animation: robotSpeak 440ms ease-in-out infinite alternate; }
+    @keyframes robotFloat { 0%,100% { transform: translateY(0) rotate(0deg); } 45% { transform: translateY(-8px) rotate(1.2deg); } 70% { transform: translateY(-3px) rotate(-.8deg); } }
+    @keyframes robotHover { 35% { transform: translateY(-12px) scale(1.05) rotate(-2deg); } 70% { transform: translateY(2px) scale(.98); } }
+    @keyframes robotSpeak { from { transform: translateY(-2px) scale(1.01); } to { transform: translateY(-7px) scale(1.06); } }
+    .robot-aura { position: absolute; inset: 2px -9px 0; border-radius: 999px; background: radial-gradient(circle at 50% 28%, rgba(103,232,255,.22), transparent 42%), radial-gradient(circle at 50% 78%, rgba(146,116,255,.2), transparent 38%); filter: blur(12px); animation: auraPulse 3s ease-in-out infinite; }
+    @keyframes auraPulse { 50% { opacity: .72; transform: scale(1.08); } }
+    .robot-antenna { width: 3px; height: 18px; border-radius: 999px; background: linear-gradient(var(--cyan), rgba(103,232,255,.18)); box-shadow: 0 0 16px rgba(103,232,255,.6); }
+    .robot-antenna::before { content: ""; position: absolute; left: 50%; top: -7px; width: 12px; height: 12px; border-radius: 50%; transform: translateX(-50%); background: radial-gradient(circle at 32% 28%, #fff 0 12%, var(--cyan) 30%, var(--violet)); box-shadow: 0 0 20px var(--cyan), 0 0 36px rgba(146,116,255,.5); }
+    .robot-head { position: relative; width: 76px; height: 60px; margin-top: -1px; border: 1px solid rgba(255,255,255,.18); border-radius: 24px; background: linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.03) 36%, rgba(13,19,44,.88)), radial-gradient(circle at 24% 16%, rgba(103,232,255,.38), transparent 34%), #10172f; box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 16px 38px rgba(0,0,0,.42), 0 0 30px rgba(103,232,255,.18); overflow: hidden; }
+    .robot-head::after { content: ""; position: absolute; inset: 5px 9px auto; height: 20px; border-radius: 18px; background: linear-gradient(110deg, rgba(255,255,255,.42), rgba(255,255,255,.08), transparent); opacity: .65; }
+    .robot-ear { position: absolute; top: 24px; width: 10px; height: 22px; border-radius: 999px; background: rgba(103,232,255,.18); border: 1px solid rgba(103,232,255,.18); }
+    .robot-ear.left { left: -7px; } .robot-ear.right { right: -7px; }
+    .robot-face { position: absolute; left: 11px; right: 11px; top: 16px; height: 32px; border: 1px solid rgba(103,232,255,.18); border-radius: 16px; background: rgba(3,8,22,.82); display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .robot-eye { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 34% 30%, #fff 0 9%, #dff 16%, var(--cyan) 42%, var(--violet)); box-shadow: 0 0 14px var(--cyan), 0 0 26px rgba(103,232,255,.45); animation: blink 5.4s ease-in-out infinite, eyeGlow 2.6s ease-in-out infinite; transform-origin: center; transition: transform 180ms ease; }
+    .robot-eye:nth-child(2) { animation-delay: 80ms; }
+    @keyframes blink { 0%,88%,94%,100% { transform: scaleY(1); } 90%,92% { transform: scaleY(.08); } }
+    @keyframes eyeGlow { 50% { box-shadow: 0 0 18px var(--green), 0 0 34px rgba(93,255,201,.45); } }
+    .robot-mouth { position: absolute; left: 50%; bottom: 8px; width: 24px; height: 5px; transform: translateX(-50%); border-radius: 999px; background: rgba(103,232,255,.26); display: flex; align-items: center; justify-content: center; gap: 2px; overflow: hidden; }
+    .robot-mouth i { width: 3px; height: 2px; border-radius: 999px; background: var(--cyan); }
+    .xeno-shell.is-speaking .robot-mouth { height: 12px; border-radius: 8px; }
+    .xeno-shell.is-speaking .robot-mouth i { animation: mouthWave 360ms ease-in-out infinite; }
+    .xeno-shell.is-speaking .robot-mouth i:nth-child(2) { animation-delay: 80ms; } .xeno-shell.is-speaking .robot-mouth i:nth-child(3) { animation-delay: 150ms; }
+    @keyframes mouthWave { 50% { height: 9px; } }
+    .robot-body { position: relative; width: 52px; height: 36px; margin-top: -3px; border: 1px solid rgba(255,255,255,.14); border-radius: 17px 17px 21px 21px; background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(12,18,42,.9)); display: grid; place-items: center; }
+    .robot-body::before, .robot-body::after { content: ""; position: absolute; top: 8px; width: 8px; height: 22px; border-radius: 999px; background: rgba(103,232,255,.18); border: 1px solid rgba(103,232,255,.16); }
+    .robot-body::before { left: -7px; transform: rotate(12deg); } .robot-body::after { right: -7px; transform: rotate(-12deg); }
+    .robot-core { width: 22px; height: 12px; border-radius: 999px; background: linear-gradient(90deg, var(--violet), var(--cyan), var(--green)); box-shadow: 0 0 18px rgba(103,232,255,.55); animation: corePulse 2s ease-in-out infinite; }
+    .xeno-shell.is-speaking .robot-core, .xeno-shell.is-listening .robot-core { animation: corePulse 420ms ease-in-out infinite alternate; }
+    @keyframes corePulse { 50% { transform: scaleX(1.18); filter: hue-rotate(30deg); } }
+    .robot-shadow { width: 58px; height: 12px; margin-top: -2px; border-radius: 50%; background: radial-gradient(ellipse, rgba(0,0,0,.34), transparent 68%); }
+    @media (max-width: 560px) { .xeno-shell { right: .6rem; bottom: .6rem; } .xeno-panel { position: fixed; inset: .5rem; width: auto; height: auto; max-height: none; } .xeno-launcher { width: 98px; height: 112px; } .xeno-tooltip { display: none; } }
+  </style>
+  <script>
+    if (new URLSearchParams(location.search).get("embed") === "1") document.documentElement.classList.add("is-embedded");
+  </script>
+</head>
+<body>
+  <div class="demo-page">
+    <div class="demo-card">
+      <h1>Xeno AI Assistant</h1>
+      <p>A premium ChatGPT-style portfolio assistant with voice, chat history, streaming responses, and a live animated robot mascot.</p>
+      <button type="button" data-open-xeno>Talk to Xeno</button>
+    </div>
+  </div>
+  <section class="xeno-shell" data-xeno-shell aria-label="Xeno AI Assistant">
+    <div class="xeno-panel" data-xeno-panel aria-hidden="true">
+      <header class="xeno-header">
+        <span class="xeno-avatar" aria-hidden="true">AI</span>
+        <div><h2>Xeno AI Assistant</h2><span class="xeno-status" data-xeno-status>Ready to help</span></div>
+        <button class="xeno-icon" data-xeno-close type="button" aria-label="Close Xeno AI Assistant">×</button>
+      </header>
+      <div class="xeno-toolbar">
+        <label class="xeno-voice">Voice <select data-xeno-voice><option value="female" selected>Female · Anjura</option><option value="male">Male · Shrey</option><option value="robot">Robot</option></select></label>
+        <button class="xeno-preview" data-xeno-preview type="button">Preview voice</button>
+        <button class="xeno-clear" data-xeno-clear type="button">Clear chat</button>
+      </div>
+      <div class="xeno-messages" data-xeno-messages role="log" aria-live="polite"></div>
+      <div class="xeno-prompts" aria-label="Quick prompts">
+        <button class="xeno-prompt" data-prompt="Tell me about yourself" type="button">About</button>
+        <button class="xeno-prompt" data-prompt="Explain your projects" type="button">Projects</button>
+        <button class="xeno-prompt" data-prompt="Skills" type="button">Skills</button>
+        <button class="xeno-prompt" data-prompt="Interview pitch" type="button">Pitch</button>
+        <button class="xeno-prompt" data-prompt="Give me a 2 minute self introduction for Abhiram" type="button">2-min intro</button>
+      </div>
+      <form class="xeno-composer" data-xeno-form>
+        <button class="xeno-mic" data-xeno-mic type="button" aria-label="Start voice input">🎙</button>
+        <input data-xeno-input type="text" autocomplete="off" placeholder="Ask Xeno about Abhiram..." />
+        <button class="xeno-send" type="submit" aria-label="Send message">➜</button>
+      </form>
+      <audio class="xeno-voice-audio" data-voice-preview-female src="./assets/voices/xeno-female-anjura.mp3" preload="metadata"></audio>
+      <audio class="xeno-voice-audio" data-voice-preview-male src="./assets/voices/xeno-male-shrey.mp3" preload="metadata"></audio>
+    </div>
+    <button class="xeno-launcher" data-xeno-toggle type="button" aria-label="Open Xeno AI Assistant" aria-expanded="false">
+      <span class="xeno-tooltip">Hi, I'm Xeno 👋</span>
+      <span class="robot-aura" aria-hidden="true"></span>
+      <span class="robot" aria-hidden="true">
+        <span class="robot-antenna"></span>
+        <span class="robot-head"><span class="robot-ear left"></span><span class="robot-ear right"></span><span class="robot-face"><span class="robot-eye"></span><span class="robot-eye"></span></span><span class="robot-mouth"><i></i><i></i><i></i></span></span>
+        <span class="robot-body"><span class="robot-core"></span></span><span class="robot-shadow"></span>
+      </span>
+    </button>
+  </section>
+  <script>
+    const XENO_KEY = "xeno-premium-chat-v1";
+    const TWO_MIN_INTRO = `Hi, my name is Abhiram Thallapally. I’m a 2025 Computer Science graduate with a focus on Artificial Intelligence, Machine Learning, and full-stack development.
+
+I enjoy building practical software that connects data, backend logic, and clean user interfaces. My strongest area is taking an idea from the technical side, such as a model, API, database, or algorithm, and turning it into something that people can actually use and understand.
+
+One of my key projects is an interactive thyroid disease prediction system, where I worked with Python, Scikit-learn, Pandas, and NumPy to build a machine learning model with more than 90 percent accuracy. I also built a full-stack budgeting tool using Java, Spring Boot, React, and MySQL, which helped me understand authentication, dashboards, structured data, and real user workflows.
+
+Along with AI and full-stack projects, I’ve also worked on API dashboards, JavaScript demos, data visualization, and portfolio tools like this Xeno AI Assistant. These projects helped me become more comfortable with problem solving, debugging, UI thinking, and explaining technical work clearly.
+
+My technical skills include Python, Java, JavaScript, SQL, React, Node.js, REST APIs, MySQL, TensorFlow, Scikit-learn, Pandas, NumPy, Tableau, Power BI, Git, GitHub, Docker, and deployment basics. I’m still learning every day, but I’m confident in my ability to pick up new tools quickly and apply them in real projects.
+
+I would describe myself as curious, steady, detail-oriented, and self-motivated. I’m currently looking for opportunities in software development, AI/ML, full-stack development, or data analytics, where I can contribute, keep improving, and build useful products with a good team.`;
+    const shell = document.querySelector("[data-xeno-shell]");
+    const panel = document.querySelector("[data-xeno-panel]");
+    const toggle = document.querySelector("[data-xeno-toggle]");
+    const closeBtn = document.querySelector("[data-xeno-close]");
+    const messages = document.querySelector("[data-xeno-messages]");
+    const form = document.querySelector("[data-xeno-form]");
+    const input = document.querySelector("[data-xeno-input]");
+    const mic = document.querySelector("[data-xeno-mic]");
+    const voiceSelect = document.querySelector("[data-xeno-voice]");
+    const statusText = document.querySelector("[data-xeno-status]");
+    const clearBtn = document.querySelector("[data-xeno-clear]");
+    const previewBtn = document.querySelector("[data-xeno-preview]");
+    const femalePreview = document.querySelector("[data-voice-preview-female]");
+    const malePreview = document.querySelector("[data-voice-preview-male]");
+    const promptButtons = document.querySelectorAll("[data-prompt]");
+    const openDemo = document.querySelector("[data-open-xeno]");
+    let history = [];
+    let voices = [];
+    let recognition = null;
+    let speaking = null;
+    let isOpen = false;
+    let pageDataCache = null;
+
+    function notifyFrame() {
+      if (parent && parent !== window) parent.postMessage({ type: "xeno-frame-state", open: isOpen }, "*");
+    }
+    function initChat() {
+      loadVoices();
+      voiceSelect.value = localStorage.getItem("xeno-voice-mode") || "female";
+      restoreHistory();
+      initVoiceInput();
+      bindEvents();
+      notifyFrame();
+    }
+    function bindEvents() {
+      toggle.addEventListener("click", () => isOpen ? closeChat() : openChat());
+      closeBtn.addEventListener("click", closeChat);
+      openDemo?.addEventListener("click", openChat);
+      window.addEventListener("message", handleParentCommand);
+      form.addEventListener("submit", (event) => { event.preventDefault(); sendMessage(input.value); });
+      input.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); sendMessage(input.value); } });
+      clearBtn.addEventListener("click", clearChat);
+      mic.addEventListener("click", startVoiceInput);
+      voiceSelect.addEventListener("change", changeVoice);
+      previewBtn.addEventListener("click", playVoicePreview);
+      promptButtons.forEach((button) => button.addEventListener("click", () => sendMessage(button.dataset.prompt)));
+      speechSynthesis?.addEventListener?.("voiceschanged", loadVoices);
+    }
+    function openChat() {
+      isOpen = true;
+      shell.classList.add("is-open");
+      panel.setAttribute("aria-hidden", "false");
+      toggle.setAttribute("aria-expanded", "true");
+      input.focus();
+      notifyFrame();
+    }
+    function closeChat() {
+      isOpen = false;
+      shell.classList.remove("is-open", "is-speaking", "is-thinking", "is-listening");
+      panel.setAttribute("aria-hidden", "true");
+      toggle.setAttribute("aria-expanded", "false");
+      speechSynthesis?.cancel?.();
+      notifyFrame();
+    }
+    function handleParentCommand(event) {
+      if (event.data?.type !== "xeno-command") return;
+      if (event.data.action === "open") openChat();
+      if (event.data.action === "close") closeChat();
+      if (event.data.action === "toggle") isOpen ? closeChat() : openChat();
+    }
+    function restoreHistory() {
+      try { history = JSON.parse(localStorage.getItem(XENO_KEY) || "[]"); } catch { history = []; }
+      if (!history.length) {
+        renderMessage("assistant", "Hi, I’m Xeno. I’m here to make Abhiram’s portfolio easier to explore. Ask me about his projects, skills, certificates, contact details, or ask for a two-minute self introduction you can use in interviews.", false);
+      } else {
+        history.forEach((msg) => renderMessage(msg.role, msg.text, false));
+      }
+    }
+    function persist() {
+      try { localStorage.setItem(XENO_KEY, JSON.stringify(history.slice(-30))); } catch {}
+    }
+    function renderMessage(role, text, save = true) {
+      const bubble = document.createElement("div");
+      bubble.className = `xeno-message ${role}`;
+      bubble.textContent = text;
+      messages.appendChild(bubble);
+      scrollToBottom();
+      if (save) {
+        history.push({ role, text });
+        persist();
+      }
+      return bubble;
+    }
+    function showTyping() {
+      const bubble = document.createElement("div");
+      bubble.className = "xeno-message assistant";
+      bubble.dataset.typing = "true";
+      bubble.innerHTML = '<span class="typing-dots"><i></i><i></i><i></i></span>';
+      messages.appendChild(bubble);
+      scrollToBottom();
+      return bubble;
+    }
+    async function sendMessage(value) {
+      const text = value.trim();
+      if (!text) return;
+      const msg = text.toLowerCase();
+      openChat();
+      renderMessage("user", text);
+      input.value = "";
+      shell.classList.add("is-thinking");
+      statusText.textContent = "Thinking...";
+      const typing = showTyping();
+      await wait(450);
+      const reply = buildResponse(msg);
+      typing.remove();
+      shell.classList.remove("is-thinking");
+      const bubble = renderMessage("assistant", "", false);
+      await streamText(bubble, reply);
+      history.push({ role: "assistant", text: reply });
+      persist();
+      speakResponse(reply);
+    }
+    async function streamText(node, text) {
+      statusText.textContent = "Typing...";
+      for (let i = 0; i <= text.length; i += 1) {
+        node.textContent = text.slice(0, i);
+        if (i % 3 === 0) scrollToBottom();
+        await wait(9);
+      }
+      statusText.textContent = "Ready to help";
+    }
+
+    function getPortfolioDocument() {
+      try {
+        return parent && parent !== window && parent.document ? parent.document : document;
+      } catch {
+        return document;
+      }
+    }
+
+    function getText(el) {
+      return (el?.innerText || el?.textContent || "").replace(/\s+/g, " ").trim();
+    }
+
+    function uniqueList(items) {
+      return [...new Set(items.map(item => item.trim()).filter(Boolean))];
+    }
+
+    function getSection(selector) {
+      return getPortfolioDocument().querySelector(selector);
+    }
+
+    function highlightSection(selector) {
+      const section = getSection(selector);
+      if (!section || section.ownerDocument === document) return;
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+      section.classList.remove("xeno-section-highlight");
+      section.getBoundingClientRect();
+      section.classList.add("xeno-section-highlight");
+      setTimeout(() => section.classList.remove("xeno-section-highlight"), 1600);
+    }
+
+    function getSkills() {
+      const doc = getPortfolioDocument();
+      const skills = uniqueList(Array.from(doc.querySelectorAll("#skills .tag-cloud span")).map(getText));
+      return skills;
+    }
+
+    function getProjects(filter = "all") {
+      const doc = getPortfolioDocument();
+      return Array.from(doc.querySelectorAll("#projects .project-card"))
+        .map(card => ({
+          title: getText(card.querySelector("h3")),
+          type: getText(card.querySelector(".project-type")),
+          category: card.dataset.projectCategory || "",
+          summary: getText(card.querySelector(".project-card__body > p")),
+          tags: uniqueList(Array.from(card.querySelectorAll(".tag-cloud span")).map(getText))
+        }))
+        .filter(project => project.title)
+        .filter(project => filter === "all" || project.category === filter || /ai|ml|machine learning/i.test(`${project.title} ${project.type} ${project.summary} ${project.tags.join(" ")}`));
+    }
+
+    function getEducation() {
+      const doc = getPortfolioDocument();
+      return Array.from(doc.querySelectorAll("#education .edu-item"))
+        .map(item => ({
+          school: getText(item.querySelector("strong")),
+          detail: getText(item.querySelector("span:not(.edu-gpa)")),
+          gpa: getText(item.querySelector(".edu-gpa"))
+        }))
+        .filter(item => item.school);
+    }
+
+    function getCertificates() {
+      const doc = getPortfolioDocument();
+      return Array.from(doc.querySelectorAll("#certificates .cert-card"))
+        .map(card => ({
+          title: getText(card.querySelector("strong")),
+          issuer: getText(card.querySelector("small")),
+          category: card.dataset.category || ""
+        }))
+        .filter(cert => cert.title);
+    }
+
+    function getContactInfo() {
+      const doc = getPortfolioDocument();
+      return Array.from(doc.querySelectorAll("#contact .contact-card, #about .hero__meta li"))
+        .map(item => {
+          const label = getText(item.querySelector("strong, span"));
+          const value = getText(item.querySelector("a, span:last-child"));
+          return label && value ? `${label}: ${value}` : "";
+        })
+        .filter(Boolean);
+    }
+
+    function getSummary() {
+      const doc = getPortfolioDocument();
+      const heroLead = getText(doc.querySelector(".hero__lede"));
+      const focus = getText(doc.querySelector("#about h2"));
+      const signals = Array.from(doc.querySelectorAll("#about .signal-card")).map(getText);
+      return [heroLead, focus, ...signals].filter(Boolean);
+    }
+
+    function getPageData(force = false) {
+      if (pageDataCache && !force) return pageDataCache;
+      pageDataCache = {
+        skills: getSkills(),
+        projects: getProjects(),
+        aiProjects: getProjects("ai"),
+        education: getEducation(),
+        certificates: getCertificates(),
+        contact: getContactInfo(),
+        summary: getSummary()
+      };
+      return pageDataCache;
+    }
+
+    function bulletList(items) {
+      return items.length ? items.map(item => `* ${item}`).join("\n") : "* No matching content found on the page.";
+    }
+
+    function formatSkills() {
+      const { skills } = getPageData();
+      highlightSection("#skills");
+      return `Here are your key skills:\n\n${bulletList(skills)}`;
+    }
+
+    function formatProjects(aiOnly = false) {
+      const data = getPageData();
+      const projects = aiOnly ? data.aiProjects : data.projects;
+      highlightSection("#projects");
+      return `${aiOnly ? "Here are your AI / ML projects" : "Here are your projects"}:\n\n${bulletList(projects.map(project => {
+        const tags = project.tags.length ? `\n  Stack: ${project.tags.join(", ")}` : "";
+        return `${project.title} — ${project.summary}${tags}`;
+      }))}`;
+    }
+
+    function formatEducation() {
+      const { education } = getPageData();
+      highlightSection("#education");
+      return `Here is your education:\n\n${bulletList(education.map(item => `${item.school} — ${[item.detail, item.gpa].filter(Boolean).join(" · ")}`))}`;
+    }
+
+    function formatCertificates() {
+      const { certificates } = getPageData();
+      highlightSection("#certificates");
+      return `Here are your certifications:\n\n${bulletList(certificates.map(cert => `${cert.title} — ${cert.issuer}`))}`;
+    }
+
+    function formatContact() {
+      const { contact } = getPageData();
+      highlightSection("#contact");
+      return `Here are your contact details:\n\n${bulletList(contact)}`;
+    }
+
+    function formatSummary() {
+      const { summary } = getPageData();
+      highlightSection("#about");
+      return `Profile summary:\n\n${summary.join("\n\n")}`;
+    }
+
+    function formatInterviewIntro() {
+      highlightSection("#about");
+      return `Interview introduction:\n\n${TWO_MIN_INTRO}`;
+    }
+
+    function buildResponse(q) {
+      const wantsInterview = /2\s*min|two\s*minute|self introduction|self intro|introduce|interview|pitch|hire|recruit/.test(q);
+      const wantsAiProjects = /(ai|ml|machine learning).*(project|demo)|explain my ai projects|ai projects/.test(q);
+      const wantsSkills = /skill|stack|technology|tools/.test(q);
+      const wantsProjects = /project|work|built|demo/.test(q);
+      const wantsEducation = /education|degree|college|school|graduate|gpa/.test(q);
+      const wantsCertificates = /cert|certificate|credential/.test(q);
+      const wantsContact = /contact|email|phone|linkedin|github/.test(q);
+      const hasSpecificTopic = wantsSkills || wantsProjects || wantsEducation || wantsCertificates || wantsContact || wantsInterview;
+      const wantsSummary = /summarize|summary|profile|who/.test(q) || (/about/.test(q) && !hasSpecificTopic);
+      const intents = [
+        { key: "summary", matched: wantsSummary, response: formatSummary },
+        { key: "skills", matched: wantsSkills, response: formatSkills },
+        { key: "projects", matched: wantsProjects, response: () => formatProjects(wantsAiProjects) },
+        { key: "education", matched: wantsEducation, response: formatEducation },
+        { key: "certificates", matched: wantsCertificates, response: formatCertificates },
+        { key: "contact", matched: wantsContact, response: formatContact },
+        { key: "interview", matched: wantsInterview, response: formatInterviewIntro }
+      ];
+      const matches = intents.filter(intent => intent.matched);
+
+      if (matches.length > 1) {
+        return matches.map(intent => intent.response()).join("\n\n---\n\n");
+      }
+
+      if (matches.length === 1) {
+        return matches[0].response();
+      }
+
+      return "I can read the portfolio page and guide you through it. Try asking:\n\n* Show my skills\n* List my projects\n* Tell me about my education\n* Show certifications\n* Give my contact details\n* Summarize my profile\n* Explain my AI projects\n* Give interview introduction";
+    }
+    function speakResponse(text) {
+      if (!("speechSynthesis" in window)) return;
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      const mode = voiceSelect.value;
+      const selected = selectVoice(mode);
+      if (selected) utterance.voice = selected;
+      utterance.rate = mode === "robot" ? 0.84 : 0.94;
+      utterance.pitch = mode === "robot" ? 0.65 : mode === "female" ? 1.08 : 0.82;
+      utterance.volume = 0.92;
+      utterance.onstart = () => { shell.classList.add("is-speaking"); statusText.textContent = "Speaking..."; };
+      utterance.onend = () => { shell.classList.remove("is-speaking"); statusText.textContent = "Ready to help"; };
+      utterance.onerror = () => { shell.classList.remove("is-speaking"); statusText.textContent = "Voice unavailable"; };
+      speaking = utterance;
+      speechSynthesis.speak(utterance);
+    }
+    function loadVoices() {
+      voices = "speechSynthesis" in window ? speechSynthesis.getVoices() : [];
+    }
+    function selectVoice(mode) {
+      loadVoices();
+      const female = voices.find((v) => /female|samantha|zira|karen|victoria|ava|susan|allison/i.test(v.name));
+      const male = voices.find((v) => /male|david|mark|daniel|alex|tom/i.test(v.name));
+      if (mode === "male") return male || voices[0];
+      return female || voices[0];
+    }
+    function initVoiceInput() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        mic.title = "Voice input is not supported in this browser";
+        return;
+      }
+      recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.onstart = () => { shell.classList.add("is-listening"); mic.classList.add("is-listening"); statusText.textContent = "Listening..."; };
+      recognition.onresult = (event) => sendMessage(event.results[0][0].transcript);
+      recognition.onerror = () => { shell.classList.remove("is-listening"); mic.classList.remove("is-listening"); statusText.textContent = "Mic permission denied"; };
+      recognition.onend = () => { shell.classList.remove("is-listening"); mic.classList.remove("is-listening"); if (!shell.classList.contains("is-speaking")) statusText.textContent = "Ready to help"; };
+    }
+    function startVoiceInput() {
+      if (!recognition) {
+        renderMessage("assistant", "Voice input is not supported here, but typed chat works perfectly.");
+        return;
+      }
+      try { recognition.start(); } catch { statusText.textContent = "Voice input unavailable"; }
+    }
+    function changeVoice() {
+      speechSynthesis?.cancel?.();
+      statusText.textContent = `${voiceSelect.options[voiceSelect.selectedIndex].text} voice selected`;
+      localStorage.setItem("xeno-voice-mode", voiceSelect.value);
+    }
+    function playVoicePreview() {
+      const selected = voiceSelect.value;
+      [femalePreview, malePreview].forEach((audio) => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+      if (selected === "female") {
+        statusText.textContent = "Playing Anjura preview...";
+        femalePreview.play().catch(() => statusText.textContent = "Preview blocked by browser");
+      } else if (selected === "male") {
+        statusText.textContent = "Playing Shrey preview...";
+        malePreview.play().catch(() => statusText.textContent = "Preview blocked by browser");
+      } else {
+        statusText.textContent = "Robot voice uses browser speech effects";
+        speakResponse("Robot voice mode is active. I will speak with a slightly synthetic tone.");
+      }
+    }
+    function clearChat() {
+      messages.innerHTML = "";
+      history = [];
+      persist();
+      renderMessage("assistant", "Fresh chat started. Ask me about Abhiram’s projects, skills, profile, or interview pitch.");
+    }
+    function scrollToBottom() { messages.scrollTop = messages.scrollHeight; }
+    function wait(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+    window.initChat = initChat;
+    window.sendMessage = sendMessage;
+    window.renderMessage = renderMessage;
+    window.speakResponse = speakResponse;
+    window.startVoiceInput = startVoiceInput;
+    window.changeVoice = changeVoice;
+    initChat();
+  </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Generator UI</title>
+  <link rel="stylesheet" href="./demo-style.css">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="shell nav">
+      <a class="brand" href="../abhiram_portfolio.html#projects">Abhiram Portfolio</a>
+
+    </div>
+  </header>
+  <main class="shell">
+    <section class="hero">
+      <h1>Image Generator UI</h1>
+      <p>Prompt a lightweight generative canvas and tune the visual style. This mirrors the front-end flow used before
+        connecting a real image model.</p>
+    </section>
+    <section class="demo-grid">
+      <div class="panel">
+        <canvas id="imageCanvas" width="820" height="460" aria-label="Generated image preview"></canvas>
+      </div>
+      <aside class="panel">
+        <h2>Prompt controls</h2>
+        <label>Prompt
+          <textarea
+            id="imagePrompt">A clean fintech dashboard with glowing chart lines and crisp glass panels</textarea>
+        </label>
+        <label>Style
+          <select id="imageStyle">
+            <option value="product">Product UI</option>
+            <option value="neon">Neon Concept</option>
+            <option value="minimal">Minimal Analytics</option>
+          </select>
+        </label>
+        <button class="btn primary" id="generateImage">Generate Preview</button>
+      </aside>
+    </section>
+  </main>
+  <footer class="shell"><a href="../abhiram_portfolio.html#projects">Back to portfolio projects</a></footer>
+  <script>
+    const imageCanvas = document.getElementById("imageCanvas");
+    const imageCtx = imageCanvas.getContext("2d");
+    function generateImagePreview() {
+      const prompt = document.getElementById("imagePrompt").value || "Generated portfolio visual";
+      const style = document.getElementById("imageStyle").value;
+      const palettes = {
+        product: ["#0b1020", "#34d399", "#60a5fa", "#f8fafc"],
+        neon: ["#160b2f", "#f472b6", "#a78bfa", "#22d3ee"],
+        minimal: ["#101827", "#f97316", "#34d399", "#e5e7eb"]
+      };
+      const colors = palettes[style];
+      imageCtx.fillStyle = colors[0];
+      imageCtx.fillRect(0, 0, imageCanvas.width, imageCanvas.height);
+      for (let i = 0; i < 34; i++) {
+        imageCtx.fillStyle = colors[(i % 3) + 1] + "33";
+        imageCtx.beginPath();
+        imageCtx.arc(Math.random() * 820, Math.random() * 460, 18 + Math.random() * 70, 0, Math.PI * 2);
+        imageCtx.fill();
+      }
+      imageCtx.strokeStyle = colors[1];
+      imageCtx.lineWidth = 5;
+      imageCtx.beginPath();
+      for (let x = 60; x < 760; x += 70) {
+        const y = 290 - Math.sin((x + prompt.length * 11) / 80) * 70 - Math.random() * 35;
+        x === 60 ? imageCtx.moveTo(x, y) : imageCtx.lineTo(x, y);
+      }
+      imageCtx.stroke();
+      imageCtx.fillStyle = "rgba(255,255,255,.08)";
+      imageCtx.fillRect(70, 70, 680, 112);
+      imageCtx.fillStyle = colors[3];
+      imageCtx.font = "800 30px system-ui";
+      imageCtx.fillText("Generated Preview", 100, 122);
+      imageCtx.font = "500 18px system-ui";
+      imageCtx.fillText(prompt.slice(0, 62), 100, 154);
+    }
+    document.getElementById("generateImage").onclick = generateImagePreview;
+    generateImagePreview();
+  </script>
+</body>
+
+</html>

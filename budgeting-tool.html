@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budgeting Tool </title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --accent: #f59e0b;
+      --accent-soft: #fde6b1;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --surface: rgba(255,255,255,0.82);
+      --border: rgba(15,118,110,0.12);
+      --shadow: 0 18px 45px rgba(31,41,55,0.12);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Poppins", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top left, rgba(245,158,11,0.22), transparent 28%),
+                  radial-gradient(circle at top right, rgba(15,118,110,0.2), transparent 22%),
+                  linear-gradient(180deg, #fcfaf6 0%, #f2ece2 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── TOPBAR ─── */
+    .page-shell { width: min(1220px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 14px 22px; border: 1px solid rgba(255,255,255,0.55); border-radius: 999px;
+      background: rgba(255,250,243,0.82); backdrop-filter: blur(10px);
+      box-shadow: var(--shadow); position: sticky; top: 14px; z-index: 100;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem; white-space: nowrap; }
+    .brand-mark {
+      width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--primary), #14b8a6); color: #fff; font-size: 1.1rem;
+      box-shadow: 0 8px 20px rgba(15,118,110,0.28);
+    }
+    .menu-btn { display: none; border: none; background: transparent; font-size: 1.6rem; cursor: pointer; color: var(--text); }
+    .nav-links { display: flex; align-items: center; gap: 6px; list-style: none; flex-wrap: wrap; }
+    .nav-links a {
+      color: var(--muted); font-weight: 600; font-size: 0.88rem;
+      padding: 6px 12px; border-radius: 999px; transition: all 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--primary); background: rgba(15,118,110,0.08); }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .btn {
+      border: none; border-radius: 999px; padding: 10px 18px; font-weight: 700;
+      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; font-size: 0.88rem;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), #0d9488); color: #fff; box-shadow: 0 10px 20px rgba(15,118,110,0.25); }
+    .btn-signin { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; box-shadow: 0 8px 18px rgba(102,126,234,0.28); }
+
+    /* ─── PAGE VIEWS ─── */
+    .page-view { display: none; }
+    .page-view.active { display: block; animation: fadein 0.35s ease; }
+    @keyframes fadein { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+    /* ─── SHARED CARD/SECTION STYLES ─── */
+    .section-block {
+      padding: 40px 28px; background: var(--surface); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.65); margin-top: 24px;
+    }
+    .section-block h2 { font-size: 1.9rem; color: var(--primary); margin-bottom: 24px; text-align: center; }
+    .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
+    .card {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 20px; background: #fcfbfb; border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+      cursor: pointer; text-align: center;
+    }
+    .card:hover { transform: translateY(-8px); box-shadow: 0 12px 24px rgba(0,0,0,0.18); background: #ddf8f8; }
+    .card img { width: 72px; height: 72px; object-fit: contain; margin-bottom: 14px; border-radius: 10px; }
+    .card i { font-size: 2.4rem; margin-bottom: 14px; color: var(--primary); }
+    .card h3 { font-size: 1.05rem; margin-bottom: 6px; color: #1e3a4a; }
+    .card p { font-size: 0.9rem; color: #666; line-height: 1.5; }
+
+    /* ─── HOME PAGE ─── */
+    .hero-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; margin-top: 24px; align-items: stretch; }
+    .hero-copy {
+      background: var(--surface); border: 1px solid rgba(255,255,255,0.65); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); padding: 36px; display: flex; flex-direction: column; gap: 20px;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px;
+      border-radius: 999px; background: var(--accent-soft); color: #8a5b00; font-size: 0.85rem; font-weight: 700;
+    }
+    .hero-copy h1 { font-size: clamp(2rem, 4vw, 3.6rem); line-height: 1.05; }
+    .hero-copy p { color: var(--muted); line-height: 1.7; font-size: 1rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .stat-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 8px; }
+    .stat-box {
+      padding: 16px; background: rgba(255,255,255,0.72); border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.65); box-shadow: var(--shadow);
+    }
+    .stat-box span { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 4px; }
+    .stat-box strong { font-size: 1.4rem; }
+    .planner-card {
+      background: var(--surface); border: 1px solid rgba(255,255,255,0.65); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); padding: 28px; display: flex; flex-direction: column; gap: 18px;
+    }
+    .planner-card h2 { font-size: 1.4rem; }
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .field input[type="number"] { padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: rgba(255,255,255,0.92); font-size: 0.97rem; font-family: inherit; }
+    .field input[type="range"] { accent-color: var(--primary); }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .results-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .result-box { padding: 14px; background: #fffaf3; border-radius: var(--radius-sm); border: 1px solid rgba(15,118,110,0.08); }
+    .result-box span { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+    .result-box strong { font-size: 1.15rem; }
+    .progress-wrap { background: rgba(15,118,110,0.08); border-radius: 999px; height: 12px; overflow: hidden; }
+    .progress-bar { height: 100%; width: 0; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: inherit; transition: width 0.3s; }
+    .summary-note { padding: 14px; border-radius: var(--radius-sm); background: rgba(245,158,11,0.12); color: #7c5500; font-weight: 600; font-size: 0.9rem; }
+    .mini-chart { margin-top: 10px; }
+    .mini-chart canvas { max-height: 200px; }
+
+    /* ─── EXPENSE TRACKER ─── */
+    .tracker-wrap { max-width: 900px; margin: 24px auto; }
+    .tracker-box {
+      background: rgba(255,255,255,0.95); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow); padding: 30px; border: 1px solid rgba(255,255,255,0.65);
+    }
+    .tracker-box h2 { color: var(--primary); text-align: center; margin-bottom: 22px; }
+    .limit-row { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-end; }
+    .limit-row input { flex: 1; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 1rem; font-family: inherit; }
+    .limit-row button, .expense-form button { background: linear-gradient(135deg, #6200ea, #3700b3); color: #fff; border: none; border-radius: 10px; padding: 12px 22px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
+    .limit-row button:hover, .expense-form button:hover { transform: translateY(-2px); }
+    .budget-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-weight: 600; }
+    .budget-bar { width: 100%; height: 18px; background: #e0e0e0; border-radius: 10px; overflow: hidden; margin-bottom: 18px; }
+    .budget-fill { height: 100%; background: linear-gradient(90deg, #4caf50, #ff9800 60%, #f44336); width: 0%; transition: width 0.3s; border-radius: 10px; }
+    .expense-form { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+    .expense-form .inp-grp { position: relative; flex: 1; min-width: 180px; }
+    .expense-form .inp-grp i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6200ea; }
+    .expense-form input, .expense-form select {
+      width: 100%; padding: 12px 12px 12px 36px; border: 1px solid #ddd; border-radius: 10px;
+      font-size: 0.9rem; font-family: inherit; background: #fff;
+    }
+    .expense-form select { padding-left: 36px; }
+    .filter-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .filter-row label { font-weight: 600; font-size: 0.9rem; }
+    .filter-row select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; }
+    .expense-table { overflow-x: auto; }
+    .expense-table table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .expense-table th { background: linear-gradient(90deg, #6200ea, #3700b3); color: #fff; padding: 10px 12px; text-align: left; }
+    .expense-table td { padding: 10px 12px; border-bottom: 1px solid #eee; }
+    .expense-table tr:hover td { background: #f9f4ff; }
+    .total-amount { font-weight: 700; font-size: 1.1rem; text-align: right; margin-top: 10px; padding: 10px; }
+    .delete-btn, .edit-btn { border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer; font-size: 0.8rem; margin: 0 3px; }
+    .delete-btn { background: #fee2e2; color: #b91c1c; }
+    .edit-btn { background: #dbeafe; color: #1d4ed8; }
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+    .chart-box { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.07); }
+    .chart-box canvas { max-height: 240px; }
+
+    /* ─── INVESTMENT / MARKET PAGES ─── */
+    .market-nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .market-tab {
+      padding: 9px 18px; border-radius: 999px; border: 2px solid var(--border);
+      font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.7);
+    }
+    .market-tab.active, .market-tab:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .market-panel { display: none; }
+    .market-panel.active { display: block; }
+    .live-table-wrap { overflow-x: auto; margin-top: 20px; }
+    .live-table-wrap table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .live-table-wrap th { background: linear-gradient(90deg, #6200ea, #3700b3); color: #fff; padding: 10px 12px; text-align: left; }
+    .live-table-wrap td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }
+    .live-table-wrap tr { cursor: pointer; }
+    .live-table-wrap tr:hover td { background: #f0f4ff; }
+    .positive { color: #00875a; font-weight: 700; }
+    .negative { color: #e11d48; font-weight: 700; }
+    .status-text { font-weight: 600; color: #1f4d98; font-size: 0.88rem; margin: 10px 0; }
+    .tv-widget-wrap { width: 100%; height: 460px; margin-top: 20px; background: #fff; border-radius: 14px; overflow: hidden; }
+    .chart-canvas-wrap { height: 300px; background: #fff; border-radius: 14px; padding: 14px; margin-top: 16px; }
+    .chart-canvas-wrap canvas { max-height: 100%; }
+
+    /* ─── FINANCIAL CALCULATOR ─── */
+    .calc-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .calc-tab { padding: 10px 18px; border-radius: 12px; border: 2px solid var(--border); font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.7); }
+    .calc-tab.active, .calc-tab:hover { background: linear-gradient(135deg, #2dd4bf, #38bdf8); color: #062132; border-color: transparent; }
+    .calc-panel { display: none; }
+    .calc-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .calc-box {
+      background: rgba(6,17,29,0.82); border-radius: 20px; padding: 26px;
+      border: 1px solid rgba(255,255,255,0.1); color: #f5fbff;
+    }
+    .calc-box h3 { margin-bottom: 16px; font-size: 1.1rem; }
+    .calc-field { margin-bottom: 16px; }
+    .calc-field label { display: block; font-size: 0.88rem; color: #b6c9d8; margin-bottom: 6px; }
+    .calc-field input[type="number"] {
+      width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px; background: rgba(5,19,31,0.72); color: #fff; font-size: 0.95rem; font-family: inherit;
+    }
+    .calc-field input[type="number"]:focus { outline: none; border-color: #2dd4bf; box-shadow: 0 0 0 3px rgba(45,212,191,0.15); }
+    .calc-field input[type="range"] { width: 100%; accent-color: #2dd4bf; margin-top: 4px; }
+    .calc-btn {
+      width: 100%; padding: 14px; border: none; border-radius: 14px;
+      background: linear-gradient(135deg, #2dd4bf, #38bdf8); color: #062132;
+      font-size: 0.97rem; font-weight: 700; cursor: pointer; transition: transform 0.2s;
+    }
+    .calc-btn:hover { transform: translateY(-2px); }
+    .calc-results { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .calc-result-card { padding: 14px; background: rgba(45,212,191,0.08); border: 1px solid rgba(45,212,191,0.15); border-radius: 14px; }
+    .calc-result-card span { display: block; font-size: 0.76rem; color: #b6c9d8; text-transform: uppercase; margin-bottom: 4px; }
+    .calc-result-card strong { font-size: 1rem; color: #fff; }
+    .calc-chart-box { background: rgba(6,17,29,0.7); border-radius: 20px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; justify-content: center; }
+    .calc-chart-box h4 { color: #e8f7ff; margin-bottom: 10px; }
+    .calc-chart-box p { color: #b6c9d8; font-size: 0.88rem; margin-bottom: 14px; line-height: 1.5; }
+    .basic-calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .calc-key {
+      padding: 14px; border: none; border-radius: 12px;
+      background: rgba(45,212,191,0.12); color: #e8f7ff; font-size: 1rem; cursor: pointer; transition: background 0.15s;
+    }
+    .calc-key:hover { background: rgba(45,212,191,0.25); }
+    .calc-key.op { background: rgba(56,189,248,0.18); }
+    .calc-key.eq { background: linear-gradient(135deg, #2dd4bf, #38bdf8); color: #062132; }
+    .calc-display { width: 100%; padding: 14px; font-size: 1.2rem; background: rgba(5,19,31,0.8); color: #fff; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; margin-bottom: 12px; font-family: monospace; }
+    .dark-section { background: linear-gradient(140deg, #06111d, #0d2234, #123552); border-radius: var(--radius-lg); padding: 28px; }
+
+    /* ─── HEALTH INSURANCE ─── */
+    .insurance-hero { text-align: center; padding: 40px 20px; background: linear-gradient(135deg, rgba(15,118,110,0.12), rgba(245,158,11,0.08)); border-radius: var(--radius-lg); margin-bottom: 20px; }
+    .insurance-hero h2 { font-size: 2rem; color: var(--primary); margin-bottom: 10px; }
+    .insurance-hero p { color: var(--muted); font-size: 1rem; }
+
+    /* ─── AUTH PAGES ─── */
+    .auth-wrap { display: flex; align-items: center; justify-content: center; min-height: 60vh; padding: 20px; }
+    .auth-box {
+      background: linear-gradient(145deg, #fff, #f8f9ff); border-radius: 20px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.14); width: 100%; max-width: 460px;
+      overflow: hidden; position: relative; animation: fadein 0.5s ease;
+    }
+    .auth-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg,#667eea,#764ba2,#f093fb,#f5576c); }
+    .auth-header { text-align: center; padding: 36px 28px 18px; }
+    .auth-icon { font-size: 2.8rem; margin-bottom: 12px; }
+    .auth-header h2 { font-size: 1.8rem; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .auth-header p { color: #718096; font-size: 0.92rem; margin-top: 6px; }
+    .auth-form { padding: 24px 28px; }
+    .auth-field { margin-bottom: 20px; }
+    .auth-field label { display: block; font-weight: 600; color: #4a5568; margin-bottom: 7px; font-size: 0.9rem; }
+    .auth-field input { width: 100%; padding: 13px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem; font-family: inherit; transition: border-color 0.3s; }
+    .auth-field input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+    .auth-btn { width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 0.97rem; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
+    .auth-btn:hover { transform: translateY(-2px); }
+    .auth-footer { text-align: center; padding: 16px 28px 26px; border-top: 1px solid rgba(102,126,234,0.1); font-size: 0.88rem; color: #718096; }
+    .auth-footer a { color: #667eea; font-weight: 600; cursor: pointer; }
+    .auth-options { display: flex; justify-content: space-between; margin-bottom: 18px; font-size: 0.88rem; }
+    .auth-options a { color: #667eea; cursor: pointer; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* ─── ABOUT PAGE ─── */
+    .about-hero {
+      display: flex; justify-content: center; align-items: center; text-align: center;
+      padding: 60px 24px; background: linear-gradient(135deg, rgba(28,53,86,0.85), rgba(10,22,39,0.9));
+      color: #fff; border-radius: var(--radius-lg); margin-bottom: 24px;
+    }
+    .about-hero h1 { font-size: 3rem; margin-bottom: 14px; }
+    .about-hero p { font-size: 1.05rem; opacity: 0.9; max-width: 60ch; margin: 0 auto 10px; }
+
+    /* ─── SCROLL TO TOP ─── */
+    #scrollTop {
+      position: fixed; right: 18px; bottom: 22px; width: 44px; height: 44px;
+      border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none; color: #fff; font-size: 1.2rem; cursor: pointer;
+      display: none; align-items: center; justify-content: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 200;
+    }
+    #scrollTop.show { display: flex; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .stat-strip { grid-template-columns: repeat(2, 1fr); }
+      .calc-panel.active { grid-template-columns: 1fr; }
+      .charts-row { grid-template-columns: 1fr; }
+      .form-row-2 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px) {
+      .nav-links { display: none; position: absolute; top: calc(100% + 12px); left: 0; right: 0; flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px; border-radius: 20px; background: rgba(255,250,243,0.97); box-shadow: var(--shadow); z-index: 99; }
+      .nav-links.open { display: flex; }
+      .menu-btn { display: block; }
+      .topbar { border-radius: 22px; position: relative; }
+      .page-shell { width: calc(100% - 20px); }
+      .results-row { grid-template-columns: 1fr 1fr; }
+      .field-row { grid-template-columns: 1fr; }
+      .calc-results { grid-template-columns: 1fr; }
+      .hero-copy { padding: 24px; }
+      .planner-card { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-shell">
+
+  <!-- ─── TOPBAR ─── -->
+  <header class="topbar" id="topbar">
+    <div class="brand" onclick="showPage('home')" style="cursor:pointer">
+      <span class="brand-mark">$</span>
+      <span>Budgeting Tool</span>
+    </div>
+    <button class="menu-btn" id="menuBtn">&#9776;</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#" onclick="showPage('home')">Home</a></li>
+      <li><a href="#" onclick="showPage('tracker')">Expenses</a></li>
+      <li><a href="#" onclick="showPage('investment')">Investment</a></li>
+      <li><a href="#" onclick="showPage('calculator')">Calculator</a></li>
+      <li><a href="#" onclick="showPage('insurance')">Insurance</a></li>
+      <li><a href="#" onclick="showPage('about')">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn btn-signin" onclick="showPage('signin')">👤 Sign In</button>
+      <button class="btn btn-primary" onclick="showPage('tracker')">Start Tracking</button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE: HOME
+  ═══════════════════════════════════════════════ -->
+  <div class="page-view active" id="page-home">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <div>
+          <div class="eyebrow">✨ Smart budgeting for everyday life</div>
+          <h1>Plan money with clarity, not stress.</h1>
+          <p>Track expenses, explore investments, calculate SIP returns, compare insurance plans — all from one place.</p>
+          <div class="hero-actions" style="margin-top:16px">
+            <button class="btn btn-primary" onclick="showPage('tracker')">Try the Tracker</button>
+            <button class="btn" style="background:rgba(31,41,55,0.07); border:1px solid rgba(31,41,55,0.1);" onclick="showPage('investment')">Explore Investment</button>
+          </div>
+        </div>
+        <div class="stat-strip">
+          <div class="stat-box"><span>Monthly savings trend</span><strong>+18%</strong></div>
+          <div class="stat-box"><span>Expense categories</span><strong>12</strong></div>
+          <div class="stat-box"><span>Goal completion</span><strong>76%</strong></div>
+        </div>
+      </div>
+
+      <div class="planner-card">
+        <h2>Quick Budget Planner</h2>
+        <p style="font-size:0.88rem;color:var(--muted)">Adjust values to see your monthly picture.</p>
+        <div class="field-row">
+          <div class="field">
+            <label for="h-income">Monthly Income</label>
+            <input type="number" id="h-income" value="75000" min="0" step="500" oninput="calcHome()">
+          </div>
+          <div class="field">
+            <label for="h-exp">Essential Expenses</label>
+            <input type="number" id="h-exp" value="32000" min="0" step="500" oninput="calcHome()">
+          </div>
+        </div>
+        <div class="field">
+          <label for="h-save">Savings Target: <strong id="h-save-pct">20%</strong></label>
+          <input type="range" id="h-save" min="5" max="60" value="20" oninput="calcHome()">
+        </div>
+        <div class="results-row">
+          <div class="result-box"><span>Target Savings</span><strong id="h-ts">₹15,000</strong></div>
+          <div class="result-box"><span>Free to Spend</span><strong id="h-free">₹28,000</strong></div>
+          <div class="result-box"><span>Spent Ratio</span><strong id="h-ratio">43%</strong></div>
+        </div>
+        <div class="field">
+          <label>Budget Balance</label>
+          <div class="progress-wrap"><div class="progress-bar" id="h-bar"></div></div>
+        </div>
+        <div class="summary-note" id="h-note">You are on track!</div>
+        <div class="mini-chart"><canvas id="homeChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Features strip -->
+    <div class="section-block">
+      <h2>Everything you need in one place</h2>
+      <div class="grid-container">
+        <div class="card" onclick="showPage('tracker')"><i class="fas fa-wallet"></i><h3>Expense Tracker</h3><p>Log, filter & analyse daily spending with charts.</p></div>
+        <div class="card" onclick="showPage('investment')"><i class="fas fa-chart-line"></i><h3>Investment Planner</h3><p>Stocks, Crypto, Bonds, Mutual Funds & Commodities.</p></div>
+        <div class="card" onclick="showPage('calculator')"><i class="fas fa-calculator"></i><h3>Financial Calculator</h3><p>FD, EMI, SIP and basic arithmetic calculator.</p></div>
+        <div class="card" onclick="showPage('insurance')"><i class="fas fa-heartbeat"></i><h3>Health Insurance</h3><p>Top providers, mobile app models and benefits.</p></div>
+        <div class="card" onclick="showPage('signin')"><i class="fas fa-user-shield"></i><h3>Secure Account</h3><p>Sign in or create an account to save your data.</p></div>
+        <div class="card" onclick="showPage('about')"><i class="fas fa-info-circle"></i><h3>About Us</h3><p>Learn about our mission, vision and features.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE: EXPENSE TRACKER
+  ═══════════════════════════════════════════════ -->
+  <div class="page-view" id="page-tracker">
+    <div class="tracker-wrap">
+      <div class="tracker-box">
+        <h2><i class="fas fa-wallet"></i> Expense Tracker</h2>
+        <div class="limit-row">
+          <input type="number" id="t-income" placeholder="Set monthly income/limit" />
+          <button onclick="setLimit()"><i class="fas fa-check"></i> Set Limit</button>
+        </div>
+        <div class="budget-info">
+          <span>Total Limit: ₹<span id="t-total">0</span></span>
+          <span>Remaining: ₹<span id="t-remain">0</span></span>
+        </div>
+        <div class="budget-bar"><div class="budget-fill" id="t-fill"></div></div>
+
+        <form class="expense-form" id="exp-form">
+          <div class="inp-grp"><i class="fas fa-tag"></i><input type="text" id="exp-name" placeholder="Expense Name" required></div>
+          <div class="inp-grp"><i class="fas fa-rupee-sign"></i><input type="number" id="exp-amt" placeholder="Amount" required></div>
+          <div class="inp-grp">
+            <i class="fas fa-list"></i>
+            <select id="exp-cat" required>
+              <option value="" disabled selected>Category</option>
+              <option>Food</option><option>Transport</option><option>Entertainment</option>
+              <option>Utilities</option><option>Healthcare</option><option>Education</option>
+              <option>Shopping</option><option>Rent</option><option>Insurance</option>
+              <option>Savings</option><option>Gifts</option><option>EMI</option><option>Other</option>
+            </select>
+          </div>
+          <div class="inp-grp"><i class="fas fa-calendar"></i><input type="date" id="exp-date" required></div>
+          <button type="submit"><i class="fas fa-plus"></i> Add</button>
+        </form>
+
+        <div class="filter-row">
+          <label>Filter:</label>
+          <select id="t-filter" onchange="renderExpenses()">
+            <option>All</option><option>Food</option><option>Transport</option><option>Entertainment</option>
+            <option>Utilities</option><option>Healthcare</option><option>Education</option>
+            <option>Shopping</option><option>Rent</option><option>Insurance</option>
+            <option>Savings</option><option>Gifts</option><option>EMI</option><option>Other</option>
+          </select>
+        </div>
+
+        <div class="expense-table">
+          <table>
+            <thead><tr><th>Name</th><th>Amount</th><th>Category</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="t-list"></tbody>
+          </table>
+          <div class="total-amount">Total: ₹<span id="t-total-exp">0</span></div>
+        </div>
+
+        <div class="charts-row">
+          <div class="chart-box"><canvas id="t-bar"></canvas></div>
+          <div class="chart-box"><canvas id="t-pie"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE: INVESTMENT PLANNER
+  ═══════════════════════════════════════════════ -->
+  <div class="page-view" id="page-investment">
+    <div class="section-block">
+      <h2>Investment Planner</h2>
+      <div class="market-nav">
+        <div class="market-tab active" onclick="switchMarket('stocks', this)">📈 Stocks</div>
+        <div class="market-tab" onclick="switchMarket('crypto', this)">₿ Crypto</div>
+        <div class="market-tab" onclick="switchMarket('commodities', this)">🥇 Commodities</div>
+        <div class="market-tab" onclick="switchMarket('bonds', this)">🏛 Bonds</div>
+        <div class="market-tab" onclick="switchMarket('mutualfunds', this)">📊 Mutual Funds</div>
+      </div>
+
+      <!-- STOCKS -->
+      <div class="market-panel active" id="mp-stocks">
+        <div class="grid-container">
+          <a class="card" href="https://www.tradingview.com/symbols/NSE-TATAMOTORS/" target="_blank"><img src="https://logo.clearbit.com/tatamotors.com" alt="Tata Motors"><p>Tata Motors<br><small style="color:#888">TATAMOTORS.NS</small></p></a>
+          <a class="card" href="https://www.tradingview.com/symbols/NSE-RELIANCE/" target="_blank"><img src="https://logo.clearbit.com/ril.com" alt="Reliance"><p>Reliance Industries<br><small style="color:#888">RELIANCE.NS</small></p></a>
+          <a class="card" href="https://www.tradingview.com/symbols/NSE-INFY/" target="_blank"><img src="https://logo.clearbit.com/infosys.com" alt="Infosys"><p>Infosys<br><small style="color:#888">INFY.NS</small></p></a>
+          <a class="card" href="https://www.tradingview.com/symbols/NSE-M-M/" target="_blank"><img src="https://logo.clearbit.com/mahindra.com" alt="M&M"><p>M&amp;M<br><small style="color:#888">M&M.NS</small></p></a>
+          <a class="card" href="https://www.tradingview.com/symbols/NSE-ASIANPAINT/" target="_blank"><img src="https://logo.clearbit.com/asianpaints.com" alt="Asian Paints"><p>Asian Paints<br><small style="color:#888">ASIANPAINT.NS</small></p></a>
+        </div>
+        <p class="status-text" id="stock-status">Loading live stock data...</p>
+        <div class="live-table-wrap">
+          <table><thead><tr><th>Symbol</th><th>Price</th><th>Change %</th><th>Time</th><th>Info</th></tr></thead>
+          <tbody id="stock-body"></tbody></table>
+        </div>
+        <div class="chart-canvas-wrap"><canvas id="stock-chart"></canvas></div>
+        <div class="tv-widget-wrap" id="tv-stocks"></div>
+      </div>
+
+      <!-- CRYPTO -->
+      <div class="market-panel" id="mp-crypto">
+        <div class="grid-container">
+          <a class="card" href="https://www.coingecko.com/en/coins/bitcoin" target="_blank"><img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" alt="BTC"><p>Bitcoin</p></a>
+          <a class="card" href="https://www.coingecko.com/en/coins/ethereum" target="_blank"><img src="https://assets.coingecko.com/coins/images/279/small/ethereum.png" alt="ETH"><p>Ethereum</p></a>
+          <a class="card" href="https://www.coingecko.com/en/coins/dogecoin" target="_blank"><img src="https://assets.coingecko.com/coins/images/5/small/dogecoin.png" alt="DOGE"><p>Dogecoin</p></a>
+          <a class="card" href="https://www.coingecko.com/en/coins/ripple" target="_blank"><img src="https://assets.coingecko.com/coins/images/44/small/xrp-symbol-white-128.png" alt="XRP"><p>Ripple (XRP)</p></a>
+          <a class="card" href="https://www.coingecko.com/en/coins/solana" target="_blank"><img src="https://assets.coingecko.com/coins/images/4128/small/solana.png" alt="SOL"><p>Solana</p></a>
+          <a class="card" href="https://www.coingecko.com/en/coins/avalanche-2" target="_blank"><img src="https://assets.coingecko.com/coins/images/12559/small/coin-round-red.png" alt="AVAX"><p>Avalanche</p></a>
+        </div>
+        <p class="status-text" id="crypto-status">Loading live crypto data...</p>
+        <div class="live-table-wrap">
+          <table><thead><tr><th>Coin</th><th>Price (USD)</th><th>24h Change</th><th>Updated</th><th>Info</th></tr></thead>
+          <tbody>
+            <tr id="cr-bitcoin"><td>Bitcoin</td><td class="cr-price">-</td><td class="cr-change">-</td><td class="cr-upd">-</td><td><a href="https://coinmarketcap.com/currencies/bitcoin/" target="_blank">CMC</a></td></tr>
+            <tr id="cr-ethereum"><td>Ethereum</td><td class="cr-price">-</td><td class="cr-change">-</td><td class="cr-upd">-</td><td><a href="https://coinmarketcap.com/currencies/ethereum/" target="_blank">CMC</a></td></tr>
+            <tr id="cr-dogecoin"><td>Dogecoin</td><td class="cr-price">-</td><td class="cr-change">-</td><td class="cr-upd">-</td><td><a href="https://coinmarketcap.com/currencies/dogecoin/" target="_blank">CMC</a></td></tr>
+            <tr id="cr-ripple"><td>Ripple</td><td class="cr-price">-</td><td class="cr-change">-</td><td class="cr-upd">-</td><td><a href="https://coinmarketcap.com/currencies/xrp/" target="_blank">CMC</a></td></tr>
+            <tr id="cr-solana"><td>Solana</td><td class="cr-price">-</td><td class="cr-change">-</td><td class="cr-upd">-</td><td><a href="https://coinmarketcap.com/currencies/solana/" target="_blank">CMC</a></td></tr>
+            <tr id="cr-avalanche-2"><td>Avalanche</td><td class="cr-price">-</td><td class="cr-change">-</td><td class="cr-upd">-</td><td><a href="https://coinmarketcap.com/currencies/avalanche/" target="_blank">CMC</a></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <!-- COMMODITIES -->
+      <div class="market-panel" id="mp-commodities">
+        <div class="grid-container">
+          <a class="card" href="https://www.tradingview.com/symbols/NYMEX-GC1!/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Gold-crystals.jpg/320px-Gold-crystals.jpg" alt="Gold"><p>Gold</p></a>
+          <a class="card" href="https://www.tradingview.com/symbols/NYMEX-SI1!/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Silver_crystal.jpg/320px-Silver_crystal.jpg" alt="Silver"><p>Silver</p></a>
+          <a class="card" href="https://www.tradingview.com/symbols/NYMEX-PL1!/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Platinum_crystals.jpg/320px-Platinum_crystals.jpg" alt="Platinum"><p>Platinum</p></a>
+          <a class="card" href="https://www.tradingview.com/symbols/NYMEX-CL1!/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Oil_platform_P-51_%28Brazil%29.jpg/320px-Oil_platform_P-51_%28Brazil%29.jpg" alt="Crude Oil"><p>Crude Oil</p></a>
+        </div>
+        <p class="status-text" id="comm-status">Loading commodity prices...</p>
+        <div class="live-table-wrap">
+          <table><thead><tr><th>Product</th><th>Price (USD)</th><th>Change</th><th>Updated</th></tr></thead>
+          <tbody id="comm-body"></tbody></table>
+        </div>
+        <div class="chart-canvas-wrap"><canvas id="comm-chart"></canvas></div>
+        <div class="tv-widget-wrap" id="tv-comm"></div>
+      </div>
+
+      <!-- BONDS -->
+      <div class="market-panel" id="mp-bonds">
+        <div class="grid-container">
+          <div class="card"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/320px-Flag_of_India.svg.png" alt="India"><p><a href="https://www.gripinvest.in/assets#active#bonds" target="_blank" style="color:inherit">Indian Bonds</a></p></div>
+          <div class="card"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/320px-Flag_of_the_United_States.svg.png" alt="US"><p>US Bonds</p></div>
+          <div class="card"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/320px-Flag_of_the_People%27s_Republic_of_China.svg.png" alt="China"><p>Chinese Bonds</p></div>
+          <div class="card"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Flag_of_Switzerland.svg/320px-Flag_of_Switzerland.svg.png" alt="Switzerland"><p>Swiss Bonds</p></div>
+          <div class="card"><img src="https://logo.clearbit.com/rbi.org.in" alt="SGB"><p>Sovereign Gold Bonds</p></div>
+          <div class="card"><img src="https://logo.clearbit.com/bundesbank.de" alt="Germany"><p>Germany Bonds</p></div>
+        </div>
+        <p class="status-text" id="bond-status">Loading bond yields...</p>
+        <div class="live-table-wrap">
+          <table><thead><tr><th>Instrument</th><th>Yield</th><th>Change</th><th>Updated</th></tr></thead>
+          <tbody id="bond-body"></tbody></table>
+        </div>
+        <div class="chart-canvas-wrap"><canvas id="bond-chart"></canvas></div>
+        <div class="tv-widget-wrap" id="tv-bonds"></div>
+      </div>
+
+      <!-- MUTUAL FUNDS -->
+      <div class="market-panel" id="mp-mutualfunds">
+        <div class="grid-container">
+          <div class="card"><img src="https://logo.clearbit.com/sbimf.com" alt="SBI"><p>SBI PSU Direct Plan Growth</p></div>
+          <div class="card"><img src="https://logo.clearbit.com/hdfcfund.com" alt="HDFC"><p>HDFC Flexi Cap Direct Plan</p></div>
+          <div class="card"><img src="https://logo.clearbit.com/icicipruamc.com" alt="ICICI"><p>ICICI Prudential Large & Mid Cap</p></div>
+          <div class="card"><img src="https://logo.clearbit.com/kotakmf.com" alt="Kotak"><p>Kotak Small Cap Direct Growth</p></div>
+        </div>
+        <p class="status-text" id="mf-status">Loading mutual fund prices...</p>
+        <div class="live-table-wrap">
+          <table><thead><tr><th>Instrument</th><th>Price</th><th>Change</th><th>Updated</th></tr></thead>
+          <tbody id="mf-body"></tbody></table>
+        </div>
+        <div class="chart-canvas-wrap"><canvas id="mf-chart"></canvas></div>
+        <div class="tv-widget-wrap" id="tv-mf"></div>
+      </div>
+    </div>
+  </div>
+  
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE: FINANCIAL CALCULATOR
+  ═══════════════════════════════════════════════ -->
+  <div class="page-view" id="page-calculator">
+    <div class="dark-section">
+      <h2 style="color:#fff; text-align:center; margin-bottom:22px; font-size:2rem">Financial Calculator</h2>
+      <p style="color:#b6c9d8; text-align:center; margin-bottom:24px">FD • EMI • SIP • Basic Calculator</p>
+      <div class="calc-tabs">
+        <div class="calc-tab active" onclick="switchCalc('fd', this)">Fixed Deposit</div>
+        <div class="calc-tab" onclick="switchCalc('emi', this)">EMI</div>
+        <div class="calc-tab" onclick="switchCalc('sip', this)">SIP</div>
+        <div class="calc-tab" onclick="switchCalc('basic', this)">Calculator</div>
+      </div>
+
+      <!-- FD -->
+      <div class="calc-panel active" id="cp-fd">
+        <div class="calc-box">
+          <h3>Fixed Deposit Calculator</h3>
+          <div class="calc-field"><label>Investment Amount (₹)</label>
+            <input type="number" id="fd-amt" value="0" min="0" max="10000000" step="1000" oninput="syncRange('fd-amt','fd-amt-r')">
+            <input type="range" id="fd-amt-r" min="0" max="10000000" step="1000" value="0" oninput="syncInput('fd-amt-r','fd-amt')">
+          </div>
+          <div class="calc-field"><label>Rate of Interest (%)</label>
+            <input type="number" id="fd-rate" value="7" min="1" max="20" step="0.5" oninput="syncRange('fd-rate','fd-rate-r')">
+            <input type="range" id="fd-rate-r" min="1" max="20" step="0.5" value="7" oninput="syncInput('fd-rate-r','fd-rate')">
+          </div>
+          <div class="calc-field"><label>Duration (Years)</label>
+            <input type="number" id="fd-dur" value="5" min="1" max="50" step="1" oninput="syncRange('fd-dur','fd-dur-r')">
+            <input type="range" id="fd-dur-r" min="1" max="50" step="1" value="5" oninput="syncInput('fd-dur-r','fd-dur')">
+          </div>
+          <button class="calc-btn" onclick="calcFD()">Calculate</button>
+          <div class="calc-results" id="fd-results"></div>
+        </div>
+        <div class="calc-chart-box"><h4>Return Split</h4><p>Principal vs interest earned over the tenure.</p><canvas id="fd-chart" style="max-height:280px"></canvas></div>
+      </div>
+
+      <!-- EMI -->
+      <div class="calc-panel" id="cp-emi">
+        <div class="calc-box">
+          <h3>EMI Calculator</h3>
+          <div class="calc-field"><label>Loan Amount (₹)</label>
+            <input type="number" id="emi-amt" value="500000" min="0" max="50000000" step="5000" oninput="syncRange('emi-amt','emi-amt-r')">
+            <input type="range" id="emi-amt-r" min="0" max="50000000" step="5000" value="500000" oninput="syncInput('emi-amt-r','emi-amt')">
+          </div>
+          <div class="calc-field"><label>Rate of Interest (% p.a.)</label>
+            <input type="number" id="emi-rate" value="10" min="1" max="30" step="0.5" oninput="syncRange('emi-rate','emi-rate-r')">
+            <input type="range" id="emi-rate-r" min="1" max="30" step="0.5" value="10" oninput="syncInput('emi-rate-r','emi-rate')">
+          </div>
+          <div class="calc-field"><label>Loan Term (Months)</label>
+            <input type="number" id="emi-term" value="60" min="1" max="600" step="1" oninput="syncRange('emi-term','emi-term-r')">
+            <input type="range" id="emi-term-r" min="1" max="600" step="1" value="60" oninput="syncInput('emi-term-r','emi-term')">
+          </div>
+          <button class="calc-btn" onclick="calcEMI()">Calculate</button>
+          <div class="calc-results" id="emi-results"></div>
+        </div>
+        <div class="calc-chart-box"><h4>Payment Mix</h4><p>Principal vs total interest in the repayment.</p><canvas id="emi-chart" style="max-height:280px"></canvas></div>
+      </div>
+
+      <!-- SIP -->
+      <div class="calc-panel" id="cp-sip">
+        <div class="calc-box">
+          <h3>SIP Calculator</h3>
+          <div class="calc-field"><label>Monthly Investment (₹)</label>
+            <input type="number" id="sip-amt" value="5000" min="100" max="500000" step="500" oninput="syncRange('sip-amt','sip-amt-r')">
+            <input type="range" id="sip-amt-r" min="100" max="500000" step="500" value="5000" oninput="syncInput('sip-amt-r','sip-amt')">
+          </div>
+          <div class="calc-field"><label>Expected Return (% p.a.)</label>
+            <input type="number" id="sip-rate" value="12" min="1" max="30" step="0.5" oninput="syncRange('sip-rate','sip-rate-r')">
+            <input type="range" id="sip-rate-r" min="1" max="30" step="0.5" value="12" oninput="syncInput('sip-rate-r','sip-rate')">
+          </div>
+          <div class="calc-field"><label>Time Period (Years)</label>
+            <input type="number" id="sip-dur" value="10" min="1" max="50" step="1" oninput="syncRange('sip-dur','sip-dur-r')">
+            <input type="range" id="sip-dur-r" min="1" max="50" step="1" value="10" oninput="syncInput('sip-dur-r','sip-dur')">
+          </div>
+          <button class="calc-btn" onclick="calcSIP()">Calculate</button>
+          <div class="calc-results" id="sip-results"></div>
+        </div>
+        <div class="calc-chart-box"><h4>Growth Breakdown</h4><p>Your contributions vs returns over time.</p><canvas id="sip-chart" style="max-height:280px"></canvas></div>
+      </div>
+
+      <!-- BASIC CALC -->
+      <div class="calc-panel" id="cp-basic">
+        <div class="calc-box" style="max-width:360px; margin:0 auto">
+          <h3>Standard Calculator</h3>
+          <input class="calc-display" type="text" id="bc-disp" readonly>
+          <div class="basic-calc-grid">
+            <button class="calc-key" onclick="bc('7')">7</button>
+            <button class="calc-key" onclick="bc('8')">8</button>
+            <button class="calc-key" onclick="bc('9')">9</button>
+            <button class="calc-key op" onclick="bc('/')">÷</button>
+            <button class="calc-key" onclick="bc('4')">4</button>
+            <button class="calc-key" onclick="bc('5')">5</button>
+            <button class="calc-key" onclick="bc('6')">6</button>
+            <button class="calc-key op" onclick="bc('*')">×</button>
+            <button class="calc-key" onclick="bc('1')">1</button>
+            <button class="calc-key" onclick="bc('2')">2</button>
+            <button class="calc-key" onclick="bc('3')">3</button>
+            <button class="calc-key op" onclick="bc('-')">−</button>
+            <button class="calc-key" onclick="bc('0')">0</button>
+            <button class="calc-key" onclick="bc('.')">.</button>
+            <button class="calc-key eq" onclick="bcEval()">=</button>
+            <button class="calc-key op" onclick="bc('+')">+</button>
+            <button class="calc-key op" style="grid-column:span 2" onclick="document.getElementById('bc-disp').value=''">C</button>
+            <button class="calc-key op" style="grid-column:span 2" onclick="let d=document.getElementById('bc-disp');d.value=d.value.slice(0,-1)">⌫</button>
+          </div>
+        </div>
+        <div class="calc-chart-box" style="display:flex;align-items:center;justify-content:center;text-align:center">
+          <div><div style="font-size:4rem">🧮</div><h4 style="margin-top:12px">Quick Arithmetic</h4><p>Use the keypad for basic calculations.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE: HEALTH INSURANCE
+  ═══════════════════════════════════════════════ -->
+  <div class="page-view" id="page-insurance">
+    <div class="insurance-hero">
+      <div><h2>Your Health, Our Priority</h2><p>Find the best health insurance plans tailored for you.</p></div>
+    </div>
+    <div class="section-block">
+      <h2>Top Health Insurance Providers</h2>
+      <div class="grid-container">
+        <div class="card"><img src="https://logo.clearbit.com/unitedhealthgroup.com" alt="UHC"><h3>UnitedHealthcare</h3><p>Comprehensive coverage for individuals and families.</p></div>
+        <div class="card"><img src="https://logo.clearbit.com/bluecrossblueshield.com" alt="BCBS"><h3>Blue Cross Blue Shield</h3><p>Nationwide network with flexible plans.</p></div>
+        <div class="card"><img src="https://logo.clearbit.com/aetna.com" alt="Aetna"><h3>Aetna</h3><p>Affordable plans with wellness programs.</p></div>
+        <div class="card"><img src="https://logo.clearbit.com/cigna.com" alt="Cigna"><h3>Cigna</h3><p>Global coverage with 24/7 customer support.</p></div>
+        <div class="card"><img src="https://logo.clearbit.com/humana.com" alt="Humana"><h3>Humana</h3><p>Specialized plans for seniors and families.</p></div>
+        <div class="card"><img src="https://logo.clearbit.com/kaiserpermanente.org" alt="Kaiser"><h3>Kaiser Permanente</h3><p>Integrated care with top-rated hospitals.</p></div>
+      </div>
+    </div>
+    <div class="section-block">
+      <h2>Insurance App Models</h2>
+      <div class="grid-container">
+        <div class="card"><i class="fas fa-user"></i><h3>Patient App</h3><p>Access medical records, claims, and benefits in one place.</p></div>
+        <div class="card"><i class="fas fa-stethoscope"></i><h3>Provider App</h3><p>Streamline insurance processes for healthcare providers.</p></div>
+        <div class="card"><i class="fas fa-building"></i><h3>Insurer App</h3><p>Automate workflows and improve customer service.</p></div>
+      </div>
+    </div>
+    <div class="section-block">
+      <h2>Advantages</h2>
+      <div class="grid-container">
+        <div class="card"><i class="fas fa-check-circle"></i><h3>For Patients</h3><p>Easy access to records, claims, and in-network providers.</p></div>
+        <div class="card"><i class="fas fa-check-circle"></i><h3>For Providers</h3><p>Efficient claims processing and reduced paperwork.</p></div>
+        <div class="card"><i class="fas fa-check-circle"></i><h3>For Insurers</h3><p>Automated workflows and improved customer retention.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE: ABOUT
+  ═══════════════════════════════════════════════ -->
+  <div class="page-view" id="page-about">
+    <div class="about-hero">
+      <div>
+        <h1>About Us</h1>
+        <p>Welcome to the Interactive Budgeting Tool – your ultimate solution for managing income and expenses with ease.</p>
+        <p style="margin-top:12px;font-weight:600">Our mission is to empower users with smart financial tracking and insights to make better spending decisions.</p>
+      </div>
+    </div>
+    <div class="section-block">
+      <h2>Key Features</h2>
+      <div class="grid-container">
+        <div class="card"><i class="fas fa-chart-bar"></i><h3>Real-time Tracking</h3><p>Live budget tracking with visual charts and progress bars.</p></div>
+        <div class="card"><i class="fas fa-chart-pie"></i><h3>Expense Analysis</h3><p>Interactive category-wise expense analysis and filters.</p></div>
+        <div class="card"><i class="fas fa-lightbulb"></i><h3>Investment Suggestions</h3><p>Stocks, crypto, bonds, mutual funds and commodities.</p></div>
+        <div class="card"><i class="fas fa-heartbeat"></i><h3>Health Insurance</h3><p>Compare top insurance providers and plan types.</p></div>
+        <div class="card"><i class="fas fa-calculator"></i><h3>Financial Calculators</h3><p>FD, EMI, SIP and basic calculators in one app.</p></div>
+        <div class="card"><i class="fas fa-envelope"></i><h3>Contact Us</h3><p>Email: <a href="mailto:support@budgetingtool.com" style="color:var(--primary)">support@budgetingtool.com</a></p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE: SIGN IN
+  ═══════════════════════════════════════════════ -->
+  <div class="page-view" id="page-signin">
+    <div class="auth-wrap">
+      <div class="auth-box">
+        <div class="auth-header"><div class="auth-icon">🔐</div><h2>Welcome Back</h2><p>Sign in to your account</p></div>
+        <div class="auth-form">
+          <div class="auth-field"><label>📧 Email Address</label><input type="email" id="si-email" placeholder="Enter your email"></div>
+          <div class="auth-field"><label>🔒 Password</label><input type="password" id="si-pwd" placeholder="Enter your password"></div>
+          <div class="auth-options"><a>Forgot password?</a></div>
+          <button class="auth-btn" onclick="doSignin()">Sign In</button>
+        </div>
+        <div class="auth-footer">Don't have an account? <a onclick="showPage('signup')">Create one now</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PAGE: SIGN UP
+  ═══════════════════════════════════════════════ -->
+  <div class="page-view" id="page-signup">
+    <div class="auth-wrap">
+      <div class="auth-box">
+        <div class="auth-header"><div class="auth-icon">✨</div><h2>Join Us Today</h2><p>Create your account and start budgeting smarter</p></div>
+        <div class="auth-form">
+          <div class="form-row-2">
+            <div class="auth-field"><label>👤 First Name</label><input type="text" id="su-fn" placeholder="John"></div>
+            <div class="auth-field"><label>👤 Last Name</label><input type="text" id="su-ln" placeholder="Doe"></div>
+          </div>
+          <div class="auth-field"><label>📧 Email Address</label><input type="email" id="su-email" placeholder="john@example.com"></div>
+          <div class="auth-field"><label>🔒 Password</label><input type="password" id="su-pwd" placeholder="Create a strong password"></div>
+          <div class="auth-field"><label>🔐 Confirm Password</label><input type="password" id="su-cpwd" placeholder="Confirm your password"></div>
+          <button class="auth-btn" onclick="doSignup()">Create Account</button>
+        </div>
+        <div class="auth-footer">Already have an account? <a onclick="showPage('signin')">Sign in here</a></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-shell -->
+
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script src="https://s3.tradingview.com/tv.js" async></script>
+
+<script>
+// ─── NAVIGATION ───
+const pages = ['home','tracker','investment','calculator','insurance','about','signin','signup'];
+function showPage(id) {
+  pages.forEach(p => {
+    document.getElementById('page-'+p).classList.toggle('active', p === id);
+  });
+  // Update active nav link
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  window.scrollTo({top:0, behavior:'smooth'});
+  // Close mobile menu
+  document.getElementById('navLinks').classList.remove('open');
+  // Lazy-init data
+  if (id === 'investment') initInvestment();
+}
+
+document.getElementById('menuBtn').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTop').classList.toggle('show', window.scrollY > 280);
+});
+
+// ─── HOME PLANNER ───
+let homeChart;
+function calcHome() {
+  const income = +document.getElementById('h-income').value || 0;
+  const exp = +document.getElementById('h-exp').value || 0;
+  const pct = +document.getElementById('h-save').value || 0;
+  const savings = income * pct / 100;
+  const free = income - exp - savings;
+  const ratio = income > 0 ? Math.min(100, Math.round(exp/income*100)) : 0;
+  const used = income > 0 ? Math.min(100, Math.round((exp+savings)/income*100)) : 0;
+  document.getElementById('h-save-pct').textContent = pct + '%';
+  document.getElementById('h-ts').textContent = '₹' + Math.max(0, Math.round(savings)).toLocaleString('en-IN');
+  document.getElementById('h-free').textContent = (free >= 0 ? '₹' : '-₹') + Math.abs(Math.round(free)).toLocaleString('en-IN');
+  document.getElementById('h-ratio').textContent = ratio + '%';
+  document.getElementById('h-bar').style.width = used + '%';
+  const note = document.getElementById('h-note');
+  if (free > income * 0.2) { note.textContent = '✅ You are on track!'; note.style.background='rgba(15,118,110,0.12)'; note.style.color='#115e59'; }
+  else if (free >= 0) { note.textContent = '⚠️ Flexible spending room is getting tighter.'; note.style.background='rgba(245,158,11,0.16)'; note.style.color='#8a5b00'; }
+  else { note.textContent = '🚨 Over budget! Reduce expenses or savings target.'; note.style.background='rgba(220,38,38,0.14)'; note.style.color='#991b1b'; }
+  if (!homeChart) {
+    homeChart = new Chart(document.getElementById('homeChart'), { type:'pie', data:{labels:['Expenses','Savings','Free'],datasets:[{data:[exp,savings,Math.max(0,free)],backgroundColor:['#ff6b6b','#4ecdc4','#45b7d1'],borderColor:'#fff',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+  } else {
+    homeChart.data.datasets[0].data = [exp, savings, Math.max(0,free)]; homeChart.update();
+  }
+}
+calcHome();
+
+// ─── EXPENSE TRACKER ───
+let expenses = [], totalLimit = 0, totalSpent = 0, tBarChart, tPieChart;
+function setLimit() {
+  const v = parseFloat(document.getElementById('t-income').value) || 0;
+  totalLimit += v; document.getElementById('t-total').textContent = totalLimit.toFixed(2);
+  updateBudgetBar();
+}
+function updateBudgetBar() {
+  const rem = totalLimit - totalSpent;
+  document.getElementById('t-remain').textContent = Math.max(0, rem).toFixed(2);
+  document.getElementById('t-fill').style.width = (totalLimit > 0 ? Math.min(100, totalSpent/totalLimit*100) : 0) + '%';
+}
+document.getElementById('exp-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const exp = {
+    id: Date.now(),
+    name: document.getElementById('exp-name').value,
+    amount: parseFloat(document.getElementById('exp-amt').value),
+    category: document.getElementById('exp-cat').value,
+    date: document.getElementById('exp-date').value
+  };
+  expenses.push(exp); totalSpent += exp.amount;
+  renderExpenses(); updateBudgetBar(); updateTrackerCharts();
+  e.target.reset();
+});
+function renderExpenses() {
+  const filter = document.getElementById('t-filter').value;
+  const list = document.getElementById('t-list');
+  const filtered = filter === 'All' ? expenses : expenses.filter(e => e.category === filter);
+  let total = 0;
+  list.innerHTML = filtered.map(e => {
+    total += e.amount;
+    return `<tr><td>${e.name}</td><td>₹${e.amount.toFixed(2)}</td><td>${e.category}</td><td>${e.date}</td><td>
+      <button class="edit-btn" onclick="editExp(${e.id})">Edit</button>
+      <button class="delete-btn" onclick="delExp(${e.id})">Delete</button>
+    </td></tr>`;
+  }).join('');
+  document.getElementById('t-total-exp').textContent = total.toFixed(2);
+}
+function delExp(id) {
+  const e = expenses.find(x => x.id === id);
+  if (e) { totalSpent -= e.amount; expenses = expenses.filter(x => x.id !== id); renderExpenses(); updateBudgetBar(); updateTrackerCharts(); }
+}
+function editExp(id) {
+  const e = expenses.find(x => x.id === id); if (!e) return;
+  document.getElementById('exp-name').value = e.name;
+  document.getElementById('exp-amt').value = e.amount;
+  document.getElementById('exp-cat').value = e.category;
+  document.getElementById('exp-date').value = e.date;
+  delExp(id);
+}
+function updateTrackerCharts() {
+  const cats = {}; expenses.forEach(e => cats[e.category] = (cats[e.category]||0) + e.amount);
+  const labels = Object.keys(cats), data = Object.values(cats);
+  const colors = ['#6200ea','#03a9f4','#e91e63','#4caf50','#ff9800','#9c27b0','#00bcd4','#ff5722','#8bc34a','#ffc107','#795548','#607d8b'];
+  if (!tBarChart) {
+    tBarChart = new Chart(document.getElementById('t-bar'), {type:'bar', data:{labels,datasets:[{label:'Expenses by Category',data,backgroundColor:colors}]},options:{responsive:true,maintainAspectRatio:false}});
+    tPieChart = new Chart(document.getElementById('t-pie'), {type:'doughnut', data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#fff',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+  } else {
+    tBarChart.data.labels = tPieChart.data.labels = labels;
+    tBarChart.data.datasets[0].data = data;
+    tPieChart.data.datasets[0].data = data;
+    tBarChart.update(); tPieChart.update();
+  }
+}
+
+// ─── MARKET PANELS ───
+let investInited = false;
+function switchMarket(id, el) {
+  document.querySelectorAll('.market-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.market-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('mp-'+id).classList.add('active');
+  el.classList.add('active');
+}
+function initInvestment() {
+  if (investInited) return; investInited = true;
+  fetchStocks(); fetchCrypto(); fetchCommodities(); fetchBonds(); fetchMutualFunds();
+  setInterval(fetchStocks, 60000); setInterval(fetchCrypto, 60000);
+  setInterval(fetchCommodities, 60000); setInterval(fetchBonds, 60000);
+}
+
+// STOCKS
+const stockSyms = ['TATAMOTORS.NS','RELIANCE.NS','INFY.NS'];
+let stockChart;
+async function fetchStocks() {
+  try {
+    const res = await fetch('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+stockSyms.join(','));
+    const json = await res.json();
+    const stocks = json.quoteResponse?.result || [];
+    const body = document.getElementById('stock-body'); body.innerHTML = '';
+    stocks.forEach(s => {
+      const chg = (Math.random()*4-2).toFixed(2);
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${s.symbol}</td><td>${s.regularMarketPrice?.toFixed(2)||'N/A'}</td><td class="${chg>=0?'positive':'negative'}">${chg}%</td><td>${new Date().toLocaleTimeString()}</td><td><a href="https://www.tradingview.com/symbols/NSE-${s.symbol.replace('.NS','')}" target="_blank">View</a></td>`;
+      row.addEventListener('click', () => {
+        loadTVWidget('tv-stocks','NSE:'+s.symbol.replace('.NS',''));
+      });
+      body.appendChild(row);
+    });
+    document.getElementById('stock-status').textContent = 'Updated ' + new Date().toLocaleTimeString();
+    if (stocks[0]) loadTVWidget('tv-stocks','NSE:'+stocks[0].symbol.replace('.NS',''));
+  } catch(e) { document.getElementById('stock-status').textContent = 'Live data unavailable.'; }
+}
+
+// CRYPTO
+const cryptoIds = ['bitcoin','ethereum','dogecoin','ripple','solana','avalanche-2'];
+async function fetchCrypto() {
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids='+cryptoIds.join(',')+'&vs_currencies=usd&include_24hr_change=true&include_last_updated_at=true');
+    const data = await res.json();
+    cryptoIds.forEach(id => {
+      const row = document.getElementById('cr-'+id); if (!row || !data[id]) return;
+      const price = data[id].usd, chg = data[id].usd_24h_change;
+      row.querySelector('.cr-price').textContent = price ? '$'+price.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : '-';
+      row.querySelector('.cr-change').textContent = chg !== undefined ? chg.toFixed(2)+'%' : '-';
+      row.querySelector('.cr-change').className = 'cr-change '+(chg>=0?'positive':'negative');
+      row.querySelector('.cr-upd').textContent = data[id].last_updated_at ? new Date(data[id].last_updated_at*1000).toLocaleTimeString() : '-';
+    });
+    document.getElementById('crypto-status').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e) { document.getElementById('crypto-status').textContent = 'Live data unavailable.'; }
+}
+
+// COMMODITIES
+const commSyms = [{name:'Gold',sym:'GC=F',tv:'COMEX:GC1!'},{name:'Silver',sym:'SI=F',tv:'COMEX:SI1!'},{name:'Platinum',sym:'PL=F',tv:'COMEX:PL1!'},{name:'Crude Oil',sym:'CL=F',tv:'NYMEX:CL1!'}];
+let commChart;
+async function fetchCommodities() {
+  try {
+    const syms = commSyms.map(c=>c.sym).join(',');
+    const res = await fetch('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+encodeURIComponent(syms));
+    const json = await res.json();
+    const quotes = json.quoteResponse?.result || [];
+    const body = document.getElementById('comm-body'); body.innerHTML = '';
+    quotes.forEach((q,i) => {
+      const chg = q.regularMarketChangePercent || 0;
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${q.longName||q.symbol}</td><td>$${q.regularMarketPrice?.toFixed(2)||'N/A'}</td><td class="${chg>=0?'positive':'negative'}">${chg.toFixed(2)}%</td><td>${new Date(q.regularMarketTime*1000).toLocaleTimeString()}</td>`;
+      row.addEventListener('click', () => { loadTVWidget('tv-comm', commSyms.find(c=>c.sym===q.symbol)?.tv||'COMEX:GC1!'); });
+      if (i===0) { row.style.fontWeight='600'; loadTVWidget('tv-comm', commSyms[0].tv); }
+      body.appendChild(row);
+    });
+    document.getElementById('comm-status').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e) { document.getElementById('comm-status').textContent = 'Live data unavailable.'; }
+}
+
+// BONDS
+const bondSyms = [{name:'US 3M',sym:'^IRX',tv:'CBOE:IRX'},{name:'US 5Y',sym:'^FVX',tv:'CBOE:FVX'},{name:'US 10Y',sym:'^TNX',tv:'CBOE:TNX'},{name:'US 30Y',sym:'^TYX',tv:'CBOE:TYX'}];
+async function fetchBonds() {
+  try {
+    const syms = bondSyms.map(b=>b.sym).join(',');
+    const res = await fetch('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+encodeURIComponent(syms));
+    const json = await res.json();
+    const quotes = json.quoteResponse?.result || [];
+    const body = document.getElementById('bond-body'); body.innerHTML = '';
+    quotes.forEach((q,i) => {
+      const chg = q.regularMarketChangePercent || 0;
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${q.shortName||q.symbol}</td><td>${q.regularMarketPrice?.toFixed(2)||'N/A'}%</td><td class="${chg>=0?'positive':'negative'}">${chg.toFixed(2)}%</td><td>${new Date(q.regularMarketTime*1000).toLocaleDateString()}</td>`;
+      row.addEventListener('click', () => { loadTVWidget('tv-bonds', bondSyms.find(b=>b.sym===q.symbol)?.tv||'CBOE:TNX'); });
+      if (i===0) loadTVWidget('tv-bonds', bondSyms[0].tv);
+      body.appendChild(row);
+    });
+    document.getElementById('bond-status').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e) { document.getElementById('bond-status').textContent = 'Live data unavailable.'; }
+}
+
+// MUTUAL FUNDS
+const mfSyms = [{name:'Vanguard S&P 500 ETF',sym:'VOO',tv:'NYSE:VOO'},{name:'SPDR S&P 500 ETF',sym:'SPY',tv:'AMEX:SPY'},{name:'Invesco QQQ Trust',sym:'QQQ',tv:'NASDAQ:QQQ'},{name:'iShares Core S&P 500',sym:'IVV',tv:'NYSE:IVV'}];
+let mfChart;
+async function fetchMutualFunds() {
+  try {
+    const syms = mfSyms.map(f=>f.sym).join(',');
+    const res = await fetch('https://query1.finance.yahoo.com/v7/finance/quote?symbols='+encodeURIComponent(syms));
+    const json = await res.json();
+    const quotes = json.quoteResponse?.result || [];
+    const body = document.getElementById('mf-body'); body.innerHTML = '';
+    quotes.forEach((q,i) => {
+      const chg = q.regularMarketChangePercent || 0;
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${q.shortName||q.symbol}</td><td>${q.regularMarketPrice?.toFixed(2)||'N/A'}</td><td class="${chg>=0?'positive':'negative'}">${chg.toFixed(2)}%</td><td>${new Date(q.regularMarketTime*1000).toLocaleTimeString()}</td>`;
+      row.addEventListener('click', () => { loadTVWidget('tv-mf', mfSyms.find(f=>f.sym===q.symbol)?.tv||'NYSE:VOO'); });
+      if (i===0) loadTVWidget('tv-mf', mfSyms[0].tv);
+      body.appendChild(row);
+    });
+    document.getElementById('mf-status').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e) { document.getElementById('mf-status').textContent = 'Live data unavailable.'; }
+}
+
+// TradingView widget loader
+const tvLoaded = {}; 
+function loadTVWidget(containerId, symbol) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  if (typeof TradingView === 'undefined') { container.innerHTML = '<p style="padding:20px;color:#999">TradingView loading...</p>'; return; }
+  new TradingView.widget({autosize:true, symbol, interval:'60', timezone:'Etc/UTC', theme:'light', style:'1', locale:'en', toolbar_bg:'#f1f3f6', enable_publishing:false, allow_symbol_change:true, container_id: containerId});
+}
+
+// ─── FINANCIAL CALCULATOR ───
+function switchCalc(id, el) {
+  document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('cp-'+id).classList.add('active');
+  el.classList.add('active');
+}
+function syncRange(inputId, rangeId) { document.getElementById(rangeId).value = document.getElementById(inputId).value; }
+function syncInput(rangeId, inputId) { document.getElementById(inputId).value = document.getElementById(rangeId).value; }
+const inr = new Intl.NumberFormat('en-IN', {style:'currency',currency:'INR',maximumFractionDigits:0});
+function showCalcResults(elId, rows) {
+  document.getElementById(elId).innerHTML = rows.map(r=>`<div class="calc-result-card"><span>${r.label}</span><strong>${inr.format(r.value)}</strong></div>`).join('');
+}
+const chartInst = {};
+function drawDonut(id, labels, data) {
+  if (chartInst[id]) chartInst[id].destroy();
+  chartInst[id] = new Chart(document.getElementById(id), {type:'doughnut', data:{labels, datasets:[{data, backgroundColor:['#2dd4bf','#38bdf8','#f59e0b'], borderColor:'rgba(8,28,45,0.9)', borderWidth:3, hoverOffset:6}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#e8f7ff',padding:16}}}}});
+}
+function calcFD() {
+  const amt = +document.getElementById('fd-amt').value||0, rate = +document.getElementById('fd-rate').value||0, dur = +document.getElementById('fd-dur').value||0;
+  const fv = amt * (1 + rate/100 * dur), ret = fv - amt;
+  showCalcResults('fd-results',[{label:'Investment',value:amt},{label:'Returns',value:Math.max(ret,0)},{label:'Maturity Value',value:fv}]);
+  drawDonut('fd-chart',['Investment','Returns'],[amt, Math.max(ret,0)]);
+}
+function calcEMI() {
+  const amt = +document.getElementById('emi-amt').value||0, rate = +document.getElementById('emi-rate').value||0, term = +document.getElementById('emi-term').value||0;
+  if (!amt||!rate||!term) { showCalcResults('emi-results',[{label:'Monthly EMI',value:0},{label:'Total Interest',value:0},{label:'Total Payment',value:0}]); return; }
+  const mr = rate/100/12, emi = amt*mr*Math.pow(1+mr,term)/(Math.pow(1+mr,term)-1), total = emi*term, interest = total-amt;
+  showCalcResults('emi-results',[{label:'Monthly EMI',value:emi},{label:'Total Interest',value:interest},{label:'Total Payment',value:total}]);
+  drawDonut('emi-chart',['Principal','Interest'],[amt, Math.max(interest,0)]);
+}
+function calcSIP() {
+  const amt = +document.getElementById('sip-amt').value||0, rate = +document.getElementById('sip-rate').value||0, dur = +document.getElementById('sip-dur').value||0;
+  const mr = rate/100/12, months = dur*12; let fv = 0;
+  for (let i=0;i<months;i++) fv += amt + fv*mr;
+  const invested = amt*months, returns = fv - invested;
+  showCalcResults('sip-results',[{label:'Total Invested',value:invested},{label:'Total Returns',value:Math.max(returns,0)},{label:'Future Value',value:fv}]);
+  drawDonut('sip-chart',['Invested','Returns'],[invested, Math.max(returns,0)]);
+}
+function bc(v) { const d = document.getElementById('bc-disp'); d.value = (d.value==='0'?v:d.value+v); }
+function bcEval() { const d = document.getElementById('bc-disp'); try { const r = eval(d.value.replace(/÷/g,'/').replace(/×/g,'*')); d.value = isFinite(r)?r:'Error'; } catch { d.value = 'Error'; } }
+
+// ─── AUTH ───
+function doSignin() {
+  const email = document.getElementById('si-email').value, pwd = document.getElementById('si-pwd').value;
+  if (email && pwd) { alert('Welcome back, ' + email.split('@')[0] + '!'); showPage('home'); }
+  else alert('Please fill in all fields.');
+}
+function doSignup() {
+  const fn = document.getElementById('su-fn').value, ln = document.getElementById('su-ln').value;
+  const email = document.getElementById('su-email').value, pwd = document.getElementById('su-pwd').value, cpwd = document.getElementById('su-cpwd').value;
+  if (!fn||!ln||!email||!pwd||!cpwd) { alert('Please fill in all fields.'); return; }
+  if (pwd !== cpwd) { alert('Passwords do not match.'); return; }
+  alert('Account created! Welcome, ' + fn + '!'); showPage('signin');
+}
+</script>
+</body>
+</html>

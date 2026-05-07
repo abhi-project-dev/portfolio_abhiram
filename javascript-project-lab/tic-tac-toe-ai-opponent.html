@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe AI Opponent</title>
+  <link rel="stylesheet" href="./demo-style.css">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="shell nav">
+      <a class="brand" href="../abhiram_portfolio.html#projects">Abhiram Portfolio</a>
+
+    </div>
+  </header>
+  <main class="shell">
+    <section class="hero">
+      <h1>Tic Tac Toe AI Opponent</h1>
+      <p>Play X against an AI opponent that chooses winning, blocking, and center moves before picking open corners.</p>
+    </section>
+    <section class="demo-grid">
+      <div class="ttt-board" id="tttBoard"></div>
+      <aside class="panel">
+        <div class="metrics">
+          <div class="metric"><strong id="humanWins">0</strong><span>you</span></div>
+          <div class="metric"><strong id="aiWins">0</strong><span>AI</span></div>
+          <div class="metric"><strong id="draws">0</strong><span>draws</span></div>
+        </div>
+        <p class="muted" id="tttStatus">Your turn. You are X.</p>
+        <button class="btn primary" id="resetTtt">New Round</button>
+      </aside>
+    </section>
+  </main>
+  <footer class="shell"><a href="../abhiram_portfolio.html#projects">Back to portfolio projects</a></footer>
+  <script>
+    let board, tttScores = { human: 0, ai: 0, draw: 0 };
+    const wins = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+    function winner(cells) {
+      for (const [a, b, c] of wins) if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) return cells[a];
+      return cells.every(Boolean) ? "draw" : "";
+    }
+    function findMove(mark) {
+      for (let i = 0; i < 9; i++) if (!board[i]) { board[i] = mark; const won = winner(board) === mark; board[i] = ""; if (won) return i; }
+      return -1;
+    }
+    function aiMove() {
+      let move = findMove("O");
+      if (move < 0) move = findMove("X");
+      if (move < 0 && !board[4]) move = 4;
+      if (move < 0) move = [0, 2, 6, 8, 1, 3, 5, 7].find(i => !board[i]);
+      if (move !== undefined) board[move] = "O";
+      renderTtt();
+      finishTtt();
+    }
+    function finishTtt() {
+      const result = winner(board);
+      if (!result) return false;
+      if (result === "X") tttScores.human++;
+      if (result === "O") tttScores.ai++;
+      if (result === "draw") tttScores.draw++;
+      document.getElementById("humanWins").textContent = tttScores.human;
+      document.getElementById("aiWins").textContent = tttScores.ai;
+      document.getElementById("draws").textContent = tttScores.draw;
+      document.getElementById("tttStatus").textContent = result === "draw" ? "Draw. New round?" : `${result} wins. New round?`;
+      return true;
+    }
+    function renderTtt() {
+      document.getElementById("tttBoard").innerHTML = board.map((value, i) => `<button class="ttt-cell" data-i="${i}">${value}</button>`).join("");
+      document.querySelectorAll(".ttt-cell").forEach(cell => cell.onclick = () => {
+        const i = Number(cell.dataset.i);
+        if (board[i] || winner(board)) return;
+        board[i] = "X"; renderTtt();
+        if (!finishTtt()) setTimeout(aiMove, 250);
+      });
+    }
+    function resetTtt() {
+      board = Array(9).fill("");
+      document.getElementById("tttStatus").textContent = "Your turn. You are X.";
+      renderTtt();
+    }
+    document.getElementById("resetTtt").onclick = resetTtt;
+    resetTtt();
+  </script>
+</body>
+
+</html>

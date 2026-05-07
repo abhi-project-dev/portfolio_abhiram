@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Card Game</title>
+  <link rel="stylesheet" href="./demo-style.css">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="shell nav">
+      <a class="brand" href="../abhiram_portfolio.html#projects">Abhiram Portfolio</a>
+
+    </div>
+  </header>
+  <main class="shell">
+    <section class="hero">
+      <h1>Memory Card Game</h1>
+      <p>Match all pairs with as few moves as possible. The board reshuffles every restart.</p>
+    </section>
+    <section class="demo-grid">
+      <div class="memory-grid" id="memoryGrid" aria-label="Memory game board"></div>
+      <aside class="panel">
+        <div class="metrics">
+          <div class="metric"><strong id="memoryMoves">0</strong><span>moves</span></div>
+          <div class="metric"><strong id="memoryMatches">0</strong><span>matches</span></div>
+          <div class="metric"><strong id="memoryTime">0s</strong><span>time</span></div>
+        </div>
+        <p class="muted" id="memoryStatus">Find the matching pairs.</p>
+        <button class="btn primary" id="restartMemory">Restart Game</button>
+      </aside>
+    </section>
+  </main>
+  <footer class="shell"><a href="../abhiram_portfolio.html#projects">Back to portfolio projects</a></footer>
+  <script>
+    const memorySymbols = ["AI", "BI", "JS", "SQL", "API", "UX", "ML", "CV"];
+    let memoryDeck = [], flipped = [], matches = 0, moves = 0, memoryStarted = 0, memoryTimer;
+    function shuffle(items) { return items.sort(() => Math.random() - 0.5); }
+    function startMemory() {
+      memoryDeck = shuffle([...memorySymbols, ...memorySymbols]).map((value, id) => ({ value, id, open: false, matched: false }));
+      flipped = []; matches = 0; moves = 0; memoryStarted = Date.now();
+      clearInterval(memoryTimer);
+      memoryTimer = setInterval(() => document.getElementById("memoryTime").textContent = Math.floor((Date.now() - memoryStarted) / 1000) + "s", 1000);
+      renderMemory();
+    }
+    function renderMemory() {
+      document.getElementById("memoryMoves").textContent = moves;
+      document.getElementById("memoryMatches").textContent = matches;
+      document.getElementById("memoryGrid").innerHTML = memoryDeck.map(card => `<button class="memory-card ${card.matched ? "matched" : ""}" data-id="${card.id}">${card.open || card.matched ? card.value : ""}</button>`).join("");
+      document.querySelectorAll(".memory-card").forEach(btn => btn.onclick = () => flipMemory(Number(btn.dataset.id)));
+    }
+    function flipMemory(id) {
+      const card = memoryDeck.find(item => item.id === id);
+      if (!card || card.open || card.matched || flipped.length === 2) return;
+      card.open = true; flipped.push(card); renderMemory();
+      if (flipped.length === 2) {
+        moves++;
+        setTimeout(() => {
+          const [a, b] = flipped;
+          if (a.value === b.value) { a.matched = b.matched = true; matches++; }
+          else { a.open = b.open = false; }
+          flipped = [];
+          document.getElementById("memoryStatus").textContent = matches === memorySymbols.length ? "Completed. Excellent memory run." : "Find the matching pairs.";
+          if (matches === memorySymbols.length) clearInterval(memoryTimer);
+          renderMemory();
+        }, 520);
+      }
+    }
+    document.getElementById("restartMemory").onclick = startMemory;
+    startMemory();
+  </script>
+</body>
+
+</html>

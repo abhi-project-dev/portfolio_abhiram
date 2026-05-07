@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Memory Card Game thumbnail</title>
+  <desc id="desc">Colorful memory card grid with matched cards, timer, and score.</desc>
+  <rect width="1200" height="720" fill="#10201b"/>
+  <text x="116" y="132" fill="#f8fafc" font-family="Arial" font-size="50" font-weight="800">Memory Match</text>
+  <g transform="translate(130 180)" stroke="#ffffff" stroke-opacity=".14" stroke-width="4">
+    <rect width="150" height="190" rx="24" fill="#38bdf8"/><rect x="184" width="150" height="190" rx="24" fill="#f59e0b"/><rect x="368" width="150" height="190" rx="24" fill="#34d399"/><rect x="552" width="150" height="190" rx="24" fill="#a78bfa"/>
+    <rect y="226" width="150" height="190" rx="24" fill="#a78bfa"/><rect x="184" y="226" width="150" height="190" rx="24" fill="#34d399"/><rect x="368" y="226" width="150" height="190" rx="24" fill="#f59e0b"/><rect x="552" y="226" width="150" height="190" rx="24" fill="#38bdf8"/>
+  </g>
+  <g fill="#07111f" font-family="Arial" font-size="70" font-weight="800"><text x="176" y="305">2</text><text x="360" y="305">4</text><text x="544" y="305">8</text><text x="728" y="305">?</text></g>
+  <rect x="900" y="210" width="178" height="260" rx="32" fill="#0f172a"/><text x="932" y="292" fill="#94a3b8" font-family="Arial" font-size="26" font-weight="700">Moves</text><text x="940" y="370" fill="#f8fafc" font-family="Arial" font-size="76" font-weight="800">24</text>
+</svg>

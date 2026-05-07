@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">GitHub Profile Analyzer thumbnail</title>
+  <desc id="desc">GitHub profile analytics UI with repository cards, language rings, and contribution metrics.</desc>
+  <rect width="1200" height="720" fill="#0f172a"/>
+  <rect x="94" y="82" width="1012" height="556" rx="38" fill="#f8fafc"/>
+  <rect x="94" y="82" width="1012" height="96" rx="38" fill="#111827"/><text x="152" y="144" fill="#f8fafc" font-family="Arial" font-size="42" font-weight="800">GitHub Profile Analyzer</text>
+  <circle cx="222" cy="300" r="86" fill="#111827"/><circle cx="196" cy="282" r="12" fill="#fff"/><circle cx="248" cy="282" r="12" fill="#fff"/><path d="M188 328c24 22 45 22 68 0" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+  <g fill="#e5e7eb"><rect x="368" y="242" width="264" height="104" rx="18"/><rect x="670" y="242" width="264" height="104" rx="18"/><rect x="368" y="386" width="264" height="104" rx="18"/><rect x="670" y="386" width="264" height="104" rx="18"/></g>
+  <g fill="#2563eb"><rect x="400" y="278" width="150" height="18" rx="9"/><rect x="702" y="278" width="110" height="18" rx="9"/><rect x="400" y="422" width="178" height="18" rx="9"/><rect x="702" y="422" width="142" height="18" rx="9"/></g>
+  <circle cx="986" cy="500" r="70" fill="none" stroke="#10b981" stroke-width="28"/><path d="M986 430a70 70 0 0 1 62 102" fill="none" stroke="#2563eb" stroke-width="28" stroke-linecap="round"/>
+</svg>

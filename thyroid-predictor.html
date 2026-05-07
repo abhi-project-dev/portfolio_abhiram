@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interactive Thyroid Disease Prediction</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #07111f;
+  --panel: rgba(10, 18, 34, 0.84);
+  --card: rgba(255,255,255,0.06);
+  --text: #f5f7fb;
+  --muted: #9aa7bd;
+  --accent: #34d399;
+  --accent2: #60a5fa;
+  --accent3: #a78bfa;
+  --line: rgba(255,255,255,0.1);
+  --danger: #fb7185;
+  --warn: #fbbf24;
+}
+body {
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(96,165,250,0.14), transparent 30%),
+    radial-gradient(circle at top right, rgba(52,211,153,0.16), transparent 28%),
+    linear-gradient(135deg, #050913 0%, #09111f 45%, #0f1830 100%);
+  padding: 28px 16px 56px;
+}
+main { max-width: 1240px; margin: 0 auto; }
+.hero {
+  background: linear-gradient(135deg, rgba(12,24,44,0.9), rgba(10,18,34,0.74));
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.3);
+  margin-bottom: 24px;
+}
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+  margin-bottom: 20px;
+}
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.1rem, 5vw, 4.2rem);
+  line-height: 0.98;
+  margin-bottom: 14px;
+}
+.lead {
+  max-width: 80ch;
+  color: #d6e1f0;
+  line-height: 1.75;
+  font-size: 1rem;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.28);
+}
+.panel h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+.panel-intro {
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 22px;
+}
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
+.form-group {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+label {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.helper {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+.range-value {
+  color: var(--accent);
+}
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+select {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(6,12,24,0.9);
+  color: var(--text);
+  padding: 12px 14px;
+  font: inherit;
+}
+.checkbox-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+}
+.checkbox-label input { accent-color: var(--accent); }
+.submit-btn, .reset-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 14px 18px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.submit-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  box-shadow: 0 18px 30px rgba(52,211,153,0.25);
+}
+.reset-btn {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.1);
+  margin-top: 18px;
+}
+.submit-btn:hover, .reset-btn:hover { transform: translateY(-2px); }
+.results-area {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+.placeholder-text,
+.result-card,
+.recommendations,
+.disclaimer,
+.insight-card,
+.how-item {
+  border-radius: 24px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.placeholder-text {
+  padding: 22px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.placeholder-text p + p { margin-top: 10px; }
+.insight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.insight-card {
+  padding: 16px;
+}
+.insight-card strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.96rem;
+}
+.insight-card span {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.result-card {
+  padding: 22px;
+}
+.result-card.low { border-color: rgba(52,211,153,0.35); }
+.result-card.medium { border-color: rgba(251,191,36,0.35); }
+.result-card.high { border-color: rgba(251,113,133,0.4); }
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.result-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+.result-probability {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+.result-risk {
+  display: inline-flex;
+  margin-top: 8px;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.06);
+}
+.result-description,
+.disclaimer p,
+.how-item p {
+  line-height: 1.75;
+  color: #d5e0ed;
+}
+.recommendations {
+  padding: 22px;
+}
+.recommendations h3,
+.how-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.25rem;
+  margin-bottom: 16px;
+}
+.recommendations-list {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+.recommendations-list li {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+.rec-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+}
+.rec-text { color: #d5e0ed; line-height: 1.7; }
+.disclaimer {
+  padding: 22px;
+  border-style: dashed;
+}
+.how-section {
+  display: grid;
+  gap: 18px;
+}
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.how-item {
+  padding: 22px;
+}
+.how-number {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  font-weight: 800;
+  background: rgba(96,165,250,0.15);
+  color: var(--accent2);
+}
+.how-item h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+@media (max-width: 980px) {
+  .layout, .how-grid, .insight-grid { grid-template-columns: 1fr; }
+  .checkbox-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  body { padding: 16px 12px 40px; }
+  .hero, .panel { padding: 20px; border-radius: 22px; }
+  .result-header { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <a class="back-link" href="./index.html#projects">← Back to Projects</a>
+    <h1>Interactive Thyroid Disease Prediction</h1>
+    <p class="lead">This tool uses machine learning style symptom scoring to predict potential thyroid disorders based on your health indicators. It is meant for educational screening only and is not a medical diagnosis. Always consult a healthcare professional for testing, diagnosis, and treatment.</p>
+  </section>
+
+  <section class="layout">
+    <div class="panel">
+      <h2>Health Assessment</h2>
+      <p class="panel-intro">Adjust the indicators below to generate a symptom-based thyroid risk estimate and recommended next steps.</p>
+      <form id="thyroidForm" class="form-grid">
+        <div class="form-group">
+          <label for="age">Age: <span class="range-value" id="ageValue">35</span></label>
+          <input type="range" id="age" min="18" max="80" value="35" oninput="document.getElementById('ageValue').textContent = this.value">
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select id="gender">
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="fatigue">Fatigue Level: <span class="range-value" id="fatigueValue">5</span>/10</label>
+          <input type="range" id="fatigue" min="0" max="10" value="5" oninput="document.getElementById('fatigueValue').textContent = this.value">
+          <p class="helper">0 = none, 10 = severe exhaustion</p>
+        </div>
+
+        <div class="form-group">
+          <label for="weight_change">Weight Changes: <span class="range-value" id="weightValue">5</span></label>
+          <input type="range" id="weight_change" min="0" max="10" value="5" oninput="document.getElementById('weightValue').textContent = this.value">
+          <p class="helper">0 = weight gain, 10 = weight loss</p>
+        </div>
+
+        <div class="form-group">
+          <label for="temperature_sensitivity">Cold Sensitivity: <span class="range-value" id="tempValue">5</span>/10</label>
+          <input type="range" id="temperature_sensitivity" min="0" max="10" value="5" oninput="document.getElementById('tempValue').textContent = this.value">
+          <p class="helper">0 = heat sensitive, 10 = cold sensitive</p>
+        </div>
+
+        <div class="form-group">
+          <label for="mood_changes">Mood Changes: <span class="range-value" id="moodValue">5</span>/10</label>
+          <input type="range" id="mood_changes" min="0" max="10" value="5" oninput="document.getElementById('moodValue').textContent = this.value">
+          <p class="helper">0 = none, 10 = severe mood impact</p>
+        </div>
+
+        <div class="form-group">
+          <label for="heart_rate">Heart Rate Changes: <span class="range-value" id="heartValue">5</span>/10</label>
+          <input type="range" id="heart_rate" min="0" max="10" value="5" oninput="document.getElementById('heartValue').textContent = this.value">
+          <p class="helper">0 = slow pulse, 10 = rapid pulse</p>
+        </div>
+
+        <div class="checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="dry_skin">
+            <span>Dry Skin</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="hair_loss">
+            <span>Hair Loss</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="concentration">Concentration Issues: <span class="range-value" id="concentrationValue">5</span>/10</label>
+          <input type="range" id="concentration" min="0" max="10" value="5" oninput="document.getElementById('concentrationValue').textContent = this.value">
+          <p class="helper">0 = none, 10 = severe concentration problems</p>
+        </div>
+
+        <button type="button" class="submit-btn" onclick="predictThyroid()">Get Prediction</button>
+      </form>
+    </div>
+
+    <div class="results-area">
+      <div class="insight-grid">
+        <div class="insight-card"><strong>What it checks</strong><span>Fatigue, weight shifts, temperature sensitivity, mood, heart rate, skin, hair, and focus.</span></div>
+        <div class="insight-card"><strong>Possible outcomes</strong><span>Hypothyroidism, hyperthyroidism, or low-risk thyroid function patterns.</span></div>
+        <div class="insight-card"><strong>Best next step</strong><span>Use the result as a screening prompt, then confirm with thyroid lab testing.</span></div>
+      </div>
+      <div id="resultsContainer" class="placeholder-text">
+        <p>Adjust your symptoms in the form and click <strong>Get Prediction</strong> to see your personalized analysis.</p>
+        <p>Your prediction will appear here with a risk label, explanation, and recommended medical follow-up steps.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-section panel">
+    <h2 class="how-title">How It Works</h2>
+    <div class="how-grid">
+      <div class="how-item">
+        <div class="how-number">1</div>
+        <h3>Input Your Symptoms</h3>
+        <p>Provide details about your symptoms and health indicators through the assessment form.</p>
+      </div>
+      <div class="how-item">
+        <div class="how-number">2</div>
+        <h3>Pattern-Based Analysis</h3>
+        <p>The scoring model compares your symptom pattern with signals commonly associated with thyroid imbalance.</p>
+      </div>
+      <div class="how-item">
+        <div class="how-number">3</div>
+        <h3>Get Insights</h3>
+        <p>Receive a probability score, a risk band, and recommended next steps for medical consultation and testing.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+function predictThyroid() {
+  const formData = {
+    age: parseInt(document.getElementById('age').value, 10),
+    gender: document.getElementById('gender').value,
+    fatigue: parseInt(document.getElementById('fatigue').value, 10),
+    weight_change: parseInt(document.getElementById('weight_change').value, 10),
+    temperature_sensitivity: parseInt(document.getElementById('temperature_sensitivity').value, 10),
+    mood_changes: parseInt(document.getElementById('mood_changes').value, 10),
+    heart_rate: parseInt(document.getElementById('heart_rate').value, 10),
+    dry_skin: document.getElementById('dry_skin').checked,
+    hair_loss: document.getElementById('hair_loss').checked,
+    concentration: parseInt(document.getElementById('concentration').value, 10),
+  };
+
+  let hypothyroidScore = 0;
+  let hyperthyroidScore = 0;
+
+  hypothyroidScore += (formData.fatigue / 10) * 25;
+  hyperthyroidScore += ((10 - formData.fatigue) / 10) * 15;
+
+  if (formData.weight_change > 5) hyperthyroidScore += 15;
+  else if (formData.weight_change < 5) hypothyroidScore += 15;
+
+  if (formData.temperature_sensitivity > 6) hypothyroidScore += 15;
+  else if (formData.temperature_sensitivity < 4) hyperthyroidScore += 15;
+
+  hypothyroidScore += (formData.mood_changes / 10) * 10;
+  hyperthyroidScore += (formData.mood_changes / 10) * 8;
+
+  if (formData.heart_rate > 6) hyperthyroidScore += 15;
+  else if (formData.heart_rate < 4) hypothyroidScore += 10;
+
+  if (formData.dry_skin) hypothyroidScore += 10;
+  if (formData.hair_loss) hypothyroidScore += 8;
+
+  hypothyroidScore += (formData.concentration / 10) * 8;
+
+  if (formData.gender === 'female') {
+    hypothyroidScore += 2;
+    hyperthyroidScore += 2;
+  }
+  if (formData.age >= 35) {
+    hypothyroidScore += 2;
+  }
+
+  const total = hypothyroidScore + hyperthyroidScore + 20;
+  const hypothyroidProb = (hypothyroidScore / total) * 100;
+  const hyperthyroidProb = (hyperthyroidScore / total) * 100;
+
+  let result;
+  if (hypothyroidProb > hyperthyroidProb) {
+    const probability = Math.min(hypothyroidProb, 95);
+    result = {
+      condition: 'Hypothyroidism',
+      probability: Math.round(probability),
+      risk: probability > 70 ? 'high' : probability > 40 ? 'medium' : 'low',
+      description: 'Your symptoms suggest an underactive thyroid. Hypothyroidism occurs when the thyroid gland does not produce enough thyroid hormones, which can slow down metabolism and affect energy, mood, and concentration.',
+      recommendations: [
+        'Consult an endocrinologist for TSH and T4 level testing.',
+        'Discuss whether thyroid medication or further screening is appropriate.',
+        'Review diet, iodine intake, and any persistent fatigue or mood changes.',
+        'Track symptom severity so you can share a clearer history with your clinician.',
+        'Plan regular follow-up appointments to monitor hormone levels if symptoms continue.'
+      ]
+    };
+  } else if (hyperthyroidProb > hypothyroidProb) {
+    const probability = Math.min(hyperthyroidProb, 95);
+    result = {
+      condition: 'Hyperthyroidism',
+      probability: Math.round(probability),
+      risk: probability > 70 ? 'high' : probability > 40 ? 'medium' : 'low',
+      description: 'Your symptoms suggest an overactive thyroid. Hyperthyroidism occurs when the thyroid produces too much hormone, which can increase metabolism and contribute to heat sensitivity, weight loss, and rapid heart rate.',
+      recommendations: [
+        'Schedule an appointment with an endocrinologist.',
+        'Ask about TSH and free T3/T4 testing to confirm the pattern.',
+        'Discuss treatment options such as medication or other clinical interventions.',
+        'Reduce stress and monitor symptoms such as palpitations or unexplained weight loss.',
+        'Follow medical guidance closely if symptoms intensify or become more frequent.'
+      ]
+    };
+  } else {
+    result = {
+      condition: 'Normal Thyroid Function',
+      probability: 100,
+      risk: 'low',
+      description: 'Your symptom pattern does not strongly suggest thyroid dysfunction right now. Routine screening is still useful, especially if you have family history, persistent symptoms, or other medical concerns.',
+      recommendations: [
+        'Continue routine health checkups and preventive screening.',
+        'Maintain a balanced diet and healthy sleep schedule.',
+        'Stay physically active and monitor for new or changing symptoms.',
+        'Consider thyroid screening if you are over 35 or have family history.',
+        'Speak with a healthcare professional if symptoms persist despite a low-risk result.'
+      ]
+    };
+  }
+
+  displayResults(result);
+}
+
+function displayResults(result) {
+  const resultsContainer = document.getElementById('resultsContainer');
+  const icon = result.risk === 'low' ? '✅' : result.risk === 'medium' ? '⚠️' : '❌';
+
+  resultsContainer.innerHTML = `
+    <div class="result-card ${result.risk}">
+      <div class="result-header">
+        <div>
+          <div class="result-title">${result.condition}</div>
+          <div class="result-probability">${result.probability}%</div>
+          <div class="result-risk">${result.risk.charAt(0).toUpperCase() + result.risk.slice(1)} Risk</div>
+        </div>
+        <div style="font-size: 3rem;">${icon}</div>
+      </div>
+      <p class="result-description">${result.description}</p>
+    </div>
+
+    <div class="recommendations">
+      <h3>Recommended Actions</h3>
+      <ul class="recommendations-list">
+        ${result.recommendations.map((rec, idx) => `
+          <li>
+            <div class="rec-number">${idx + 1}</div>
+            <div class="rec-text">${rec}</div>
+          </li>
+        `).join('')}
+      </ul>
+    </div>
+
+    <div class="disclaimer">
+      <p><strong>Important Disclaimer:</strong> This tool is designed for educational and informational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider for thyroid screening, lab testing, and treatment decisions.</p>
+    </div>
+
+    <button type="button" class="reset-btn" onclick="resetForm()">Try Another Assessment</button>
+  `;
+}
+
+function resetForm() {
+  document.getElementById('thyroidForm').reset();
+  const defaults = [
+    ['ageValue', '35'],
+    ['fatigueValue', '5'],
+    ['weightValue', '5'],
+    ['tempValue', '5'],
+    ['moodValue', '5'],
+    ['heartValue', '5'],
+    ['concentrationValue', '5']
+  ];
+  defaults.forEach(([id, value]) => {
+    document.getElementById(id).textContent = value;
+  });
+  document.getElementById('age').value = 35;
+  document.getElementById('fatigue').value = 5;
+  document.getElementById('weight_change').value = 5;
+  document.getElementById('temperature_sensitivity').value = 5;
+  document.getElementById('mood_changes').value = 5;
+  document.getElementById('heart_rate').value = 5;
+  document.getElementById('concentration').value = 5;
+  document.getElementById('resultsContainer').innerHTML = `
+    <p>Adjust your symptoms in the form and click <strong>Get Prediction</strong> to see your personalized analysis.</p>
+    <p>Your prediction will appear here with a risk label, explanation, and recommended medical follow-up steps.</p>
+  `;
+  document.getElementById('resultsContainer').className = 'placeholder-text';
+}
+</script>
+</body>
+</html>

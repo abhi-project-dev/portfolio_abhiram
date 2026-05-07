@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xeno — AI Assistant</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #050810;
+      --surface: #0d1117;
+      --card: #111827;
+      --border: rgba(56, 189, 248, 0.12);
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --cyan: #38bdf8;
+      --blue: #3b82f6;
+      --teal: #2dd4bf;
+      --glow-cyan: rgba(56, 189, 248, 0.35);
+      --glow-blue: rgba(59, 130, 246, 0.3);
+      --glow-teal: rgba(45, 212, 191, 0.25);
+      --accent: #06b6d4;
+      --accent-dim: rgba(6, 182, 212, 0.15);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    /* ── CANVAS BACKGROUND ── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── LAYOUT ── */
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 900px;
+      padding: 2rem 1.5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+    }
+
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--cyan);
+      text-transform: uppercase;
+    }
+
+    .logo span {
+      color: var(--text);
+    }
+
+    .header-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.35rem 0.9rem;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: statusPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes statusPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.5);
+      }
+
+      50% {
+        opacity: 0.7;
+        box-shadow: 0 0 0 5px rgba(45, 212, 191, 0);
+      }
+    }
+
+    /* ── HERO TEXT ── */
+    .hero-text {
+      text-align: center;
+    }
+
+    .hero-text h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 0.6rem;
+      background: linear-gradient(135deg, #e2e8f0 30%, var(--cyan) 70%, var(--teal) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-text p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ── ROBOT SCENE ── */
+    .robot-scene {
+      position: relative;
+      width: 300px;
+      height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Particles canvas */
+    #particle-canvas {
+      position: absolute;
+      inset: -40px;
+      width: calc(100% + 80px);
+      height: calc(100% + 80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Aura glow ring */
+    .robot-aura {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, transparent 70%);
+      animation: auraPulse 3s ease-in-out infinite;
+      z-index: 1;
+    }
+
+    @keyframes auraPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+
+      50% {
+        transform: scale(1.18);
+        opacity: 1;
+      }
+    }
+
+    /* Orbit rings */
+    .orbit-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(56, 189, 248, 0.1);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .orbit1 {
+      width: 240px;
+      height: 240px;
+      animation: orbitSpin 12s linear infinite;
+    }
+
+    .orbit2 {
+      width: 290px;
+      height: 290px;
+      animation: orbitSpin 18s linear infinite reverse;
+    }
+
+    @keyframes orbitSpin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .orbit-dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      top: -3px;
+      left: 50%;
+      margin-left: -3px;
+    }
+
+    /* ── ROBOT BODY ── */
+    .robot-wrap {
+      position: relative;
+      z-index: 2;
+      animation: robotFloat 3.5s ease-in-out infinite;
+      transition: filter 0.3s ease, transform 0.3s ease;
+    }
+
+    .robot-scene:hover .robot-wrap {
+      filter: drop-shadow(0 0 24px var(--glow-cyan)) drop-shadow(0 0 48px var(--glow-blue));
+      transform: scale(1.05) translateY(-4px);
+    }
+
+    .robot-scene.talking .robot-wrap {
+      filter: drop-shadow(0 0 30px var(--glow-cyan)) drop-shadow(0 0 60px rgba(56, 189, 248, 0.5));
+      animation: robotFloat 3.5s ease-in-out infinite, robotTalk 0.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes robotFloat {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(-0.5deg);
+      }
+
+      50% {
+        transform: translateY(-14px) rotate(0.5deg);
+      }
+    }
+
+    @keyframes robotTalk {
+      from {
+        transform: translateY(var(--float-y, 0px)) rotate(-0.5deg) scale(1);
+      }
+
+      to {
+        transform: translateY(var(--float-y, 0px)) rotate(0.5deg) scale(1.02);
+      }
+    }
+
+    /* Robot head */
+    .robot-head {
+      width: 120px;
+      height: 100px;
+      background: linear-gradient(145deg, #1a2744 0%, #0d1929 60%, #0a1520 100%);
+      border-radius: 32px;
+      margin: 0 auto;
+      position: relative;
+      border: 1.5px solid rgba(56, 189, 248, 0.3);
+      box-shadow:
+        0 0 20px rgba(56, 189, 248, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.4);
+      overflow: visible;
+    }
+
+    /* Glass reflection */
+    .robot-head::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      width: 40%;
+      height: 35%;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent);
+      border-radius: 16px 16px 0 0;
+      pointer-events: none;
+    }
+
+    /* Antenna */
+    .antenna {
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .antenna-stick {
+      width: 3px;
+      height: 18px;
+      background: linear-gradient(to top, rgba(56, 189, 248, 0.4), rgba(56, 189, 248, 0.8));
+      border-radius: 2px;
+    }
+
+    .antenna-ball {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #7dd3fc, var(--cyan));
+      box-shadow: 0 0 8px var(--cyan), 0 0 16px var(--glow-cyan);
+      animation: antennaPulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes antennaPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 6px var(--cyan), 0 0 12px var(--glow-cyan);
+        transform: scale(1);
+      }
+
+      50% {
+        box-shadow: 0 0 12px var(--cyan), 0 0 24px var(--glow-cyan), 0 0 36px rgba(56, 189, 248, 0.2);
+        transform: scale(1.25);
+      }
+    }
+
+    /* Ears */
+    .ear {
+      position: absolute;
+      top: 28px;
+      width: 14px;
+      height: 36px;
+      background: linear-gradient(180deg, #1a2744, #0d1929);
+      border-radius: 8px;
+      border: 1.5px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .ear-left {
+      left: -12px;
+      border-radius: 8px 4px 4px 8px;
+    }
+
+    .ear-right {
+      right: -12px;
+      border-radius: 4px 8px 8px 4px;
+    }
+
+    .ear::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 5px;
+      height: 14px;
+      background: var(--cyan);
+      border-radius: 3px;
+      opacity: 0.4;
+      animation: earPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes earPulse {
+
+      0%,
+      100% {
+        opacity: 0.3;
+      }
+
+      50% {
+        opacity: 0.7;
+        box-shadow: 0 0 6px var(--cyan);
+      }
+    }
+
+    /* Eyes */
+    .eyes {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      padding-top: 22px;
+    }
+
+    .eye {
+      width: 30px;
+      height: 30px;
+      background: radial-gradient(circle at 40% 35%, #7dd3fc 0%, #0ea5e9 40%, #0369a1 80%, #0c1a2e 100%);
+      border-radius: 50%;
+      position: relative;
+      box-shadow: 0 0 10px var(--cyan), 0 0 20px var(--glow-cyan), 0 0 30px rgba(56, 189, 248, 0.15);
+      animation: eyeGlow 2s ease-in-out infinite;
+      transition: transform 0.3s ease;
+    }
+
+    .robot-scene:hover .eye {
+      animation: eyeGlowHover 0.8s ease-in-out infinite;
+    }
+
+    .robot-scene.thinking .eye {
+      animation: eyeThink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes eyeGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 8px var(--cyan), 0 0 16px var(--glow-cyan);
+      }
+
+      50% {
+        box-shadow: 0 0 14px var(--cyan), 0 0 28px var(--glow-cyan), 0 0 40px rgba(56, 189, 248, 0.2);
+      }
+    }
+
+    @keyframes eyeGlowHover {
+
+      0%,
+      100% {
+        box-shadow: 0 0 16px var(--cyan), 0 0 32px var(--glow-cyan), 0 0 48px rgba(56, 189, 248, 0.3);
+        transform: scale(1.1);
+      }
+
+      50% {
+        box-shadow: 0 0 24px var(--cyan), 0 0 48px var(--glow-cyan);
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes eyeThink {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(3px) translateY(-2px);
+      }
+
+      75% {
+        transform: translateX(-3px) translateY(2px);
+      }
+    }
+
+    /* Eye shine */
+    .eye::before {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 6px;
+      width: 8px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 50%;
+      filter: blur(1px);
+    }
+
+    .eye::after {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 50%;
+    }
+
+    /* Eyelid for blinking */
+    .eyelid {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg, #1a2744, #0d1929);
+      border-radius: 50%;
+      transform-origin: top;
+      transform: scaleY(0);
+      transition: transform 0.08s ease;
+    }
+
+    .eye.blink .eyelid {
+      transform: scaleY(1);
+    }
+
+    /* Mouth */
+    .mouth-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    .mouth {
+      width: 42px;
+      height: 12px;
+      background: #050d1a;
+      border-radius: 0 0 12px 12px;
+      border: 1.5px solid rgba(56, 189, 248, 0.2);
+      border-top: none;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .mouth-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 0;
+      background: linear-gradient(90deg, var(--cyan), var(--teal));
+      border-radius: 0 0 10px 10px;
+      transition: height 0.15s ease;
+    }
+
+    .robot-scene.talking .mouth-bar {
+      animation: mouthTalk 0.25s ease-in-out infinite alternate;
+    }
+
+    @keyframes mouthTalk {
+      from {
+        height: 2px;
+      }
+
+      to {
+        height: 9px;
+        box-shadow: 0 -2px 8px var(--cyan);
+      }
+    }
+
+    /* Robot body */
+    .robot-body {
+      width: 130px;
+      height: 90px;
+      background: linear-gradient(145deg, #162035 0%, #0d1929 60%, #0a1520 100%);
+      border-radius: 24px;
+      margin: 6px auto 0;
+      position: relative;
+      border: 1.5px solid rgba(56, 189, 248, 0.2);
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .robot-body::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 12px;
+      width: 35%;
+      height: 30%;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
+      border-radius: 12px;
+      pointer-events: none;
+    }
+
+    /* Chest panel */
+    .chest-panel {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90px;
+      height: 56px;
+      background: rgba(5, 10, 20, 0.7);
+      border-radius: 14px;
+      border: 1px solid rgba(56, 189, 248, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 6px;
+    }
+
+    .chest-row {
+      display: flex;
+      gap: 5px;
+    }
+
+    .chest-light {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      animation: lightPulse 1.6s ease-in-out infinite;
+    }
+
+    .chest-light:nth-child(1) {
+      background: var(--cyan);
+      animation-delay: 0s;
+    }
+
+    .chest-light:nth-child(2) {
+      background: var(--teal);
+      animation-delay: 0.3s;
+    }
+
+    .chest-light:nth-child(3) {
+      background: #3b82f6;
+      animation-delay: 0.6s;
+    }
+
+    .chest-light:nth-child(4) {
+      background: #06b6d4;
+      animation-delay: 0.2s;
+    }
+
+    .chest-light:nth-child(5) {
+      background: var(--teal);
+      animation-delay: 0.5s;
+    }
+
+    .chest-light:nth-child(6) {
+      background: var(--cyan);
+      animation-delay: 0.8s;
+    }
+
+    @keyframes lightPulse {
+
+      0%,
+      100% {
+        opacity: 0.35;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.15);
+        box-shadow: 0 0 6px currentColor;
+      }
+    }
+
+    .robot-scene.talking .chest-light {
+      animation: lightPulseFast 0.3s ease-in-out infinite;
+    }
+
+    @keyframes lightPulseFast {
+
+      0%,
+      100% {
+        opacity: 0.4;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.3);
+        box-shadow: 0 0 8px currentColor;
+      }
+    }
+
+    /* Arms */
+    .arms {
+      display: flex;
+      justify-content: space-between;
+      width: 175px;
+      margin: -60px auto 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .arm {
+      width: 18px;
+      height: 60px;
+      background: linear-gradient(180deg, #162035, #0d1929);
+      border-radius: 10px;
+      border: 1.5px solid rgba(56, 189, 248, 0.18);
+      position: relative;
+    }
+
+    .arm-left {
+      border-radius: 10px 4px 4px 10px;
+      transform-origin: top center;
+      animation: armIdleLeft 4s ease-in-out infinite;
+    }
+
+    .arm-right {
+      border-radius: 4px 10px 10px 4px;
+      transform-origin: top center;
+      animation: armIdleRight 4s ease-in-out infinite;
+    }
+
+    .robot-scene:hover .arm-right {
+      animation: armWave 0.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes armIdleLeft {
+
+      0%,
+      100% {
+        transform: rotate(-4deg);
+      }
+
+      50% {
+        transform: rotate(4deg);
+      }
+    }
+
+    @keyframes armIdleRight {
+
+      0%,
+      100% {
+        transform: rotate(4deg);
+      }
+
+      50% {
+        transform: rotate(-4deg);
+      }
+    }
+
+    @keyframes armWave {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(-30deg);
+      }
+    }
+
+    .hand {
+      width: 18px;
+      height: 18px;
+      border-radius: 50% 50% 40% 40%;
+      background: linear-gradient(145deg, #1a2744, #0d1929);
+      border: 1.5px solid rgba(56, 189, 248, 0.18);
+      position: absolute;
+      bottom: -10px;
+      left: -1px;
+    }
+
+    /* Legs */
+    .legs {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 4px;
+    }
+
+    .leg {
+      width: 22px;
+      height: 28px;
+      background: linear-gradient(180deg, #162035, #0d1929);
+      border-radius: 0 0 10px 10px;
+      border: 1.5px solid rgba(56, 189, 248, 0.15);
+      border-top: none;
+      position: relative;
+    }
+
+    .foot {
+      position: absolute;
+      bottom: -8px;
+      left: -4px;
+      width: 30px;
+      height: 10px;
+      background: linear-gradient(180deg, #162035, #0d1929);
+      border-radius: 0 0 8px 8px;
+      border: 1.5px solid rgba(56, 189, 248, 0.15);
+      border-top: none;
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.08);
+    }
+
+    /* Shadow under robot */
+    .robot-shadow {
+      width: 100px;
+      height: 14px;
+      background: radial-gradient(ellipse, rgba(56, 189, 248, 0.12), transparent 70%);
+      margin: 6px auto 0;
+      animation: shadowPulse 3.5s ease-in-out infinite;
+    }
+
+    @keyframes shadowPulse {
+
+      0%,
+      100% {
+        transform: scaleX(1);
+        opacity: 0.5;
+      }
+
+      50% {
+        transform: scaleX(0.7);
+        opacity: 0.8;
+      }
+    }
+
+    /* ── STATE LABEL ── */
+    .state-badge {
+      position: absolute;
+      top: 8px;
+      right: -16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.65rem;
+      color: var(--cyan);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateX(8px);
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .robot-scene:hover .state-badge {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ── CHAT SECTION ── */
+    .chat-section {
+      width: 100%;
+      max-width: 620px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .chat-header-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chat-header-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--cyan);
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .chat-header-text h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .chat-header-text p {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* Chat messages box */
+    .chat-messages {
+      height: 320px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      padding: 1.2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.2);
+      border-radius: 2px;
+    }
+
+    /* Message bubbles */
+    .msg {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-end;
+      animation: msgFadeIn 0.35s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes msgFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .msg.user {
+      flex-direction: row-reverse;
+    }
+
+    .msg-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .msg.bot .msg-avatar {
+      background: linear-gradient(135deg, #0c2a4a, #0d3050);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--cyan);
+    }
+
+    .msg.user .msg-avatar {
+      background: linear-gradient(135deg, #1a3a5c, #1e4a6e);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      color: var(--teal);
+    }
+
+    .msg-bubble {
+      max-width: 78%;
+      padding: 0.65rem 0.95rem;
+      border-radius: 16px;
+      font-size: 0.875rem;
+      line-height: 1.55;
+    }
+
+    .msg.bot .msg-bubble {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+      color: var(--text);
+    }
+
+    .msg.user .msg-bubble {
+      background: linear-gradient(135deg, #0c3a5e, #0f4a72);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-bottom-right-radius: 4px;
+      color: #e0f2fe;
+    }
+
+    /* Typing dots */
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+      padding: 0.65rem 0.95rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+    }
+
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+      animation: typingBounce 1.2s ease-in-out infinite;
+    }
+
+    .typing-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typingBounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.4;
+      }
+
+      50% {
+        transform: translateY(-5px);
+        opacity: 1;
+      }
+    }
+
+    /* Chat input */
+    .chat-input-wrap {
+      display: flex;
+      gap: 0.6rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.5rem 0.6rem 0.5rem 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input-wrap:focus-within {
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.06);
+    }
+
+    #chat-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 0.875rem;
+      font-family: inherit;
+      resize: none;
+      min-height: 20px;
+      max-height: 100px;
+      line-height: 1.5;
+    }
+
+    #chat-input::placeholder {
+      color: var(--muted);
+    }
+
+    .send-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, var(--cyan), var(--teal));
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      align-self: flex-end;
+    }
+
+    .send-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 4px 14px var(--glow-cyan);
+    }
+
+    .send-btn:active {
+      transform: scale(0.95);
+    }
+
+    .send-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Suggestion chips */
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    .chip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.3rem 0.85rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .chip:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      color: var(--cyan);
+      background: rgba(56, 189, 248, 0.06);
+    }
+
+    /* ── INTEGRATION NOTE ── */
+    .integration-note {
+      width: 100%;
+      max-width: 620px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.2rem 1.4rem;
+    }
+
+    .integration-note h3 {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--cyan);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    .integration-note ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .integration-note li {
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .integration-note li::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--teal);
+      flex-shrink: 0;
+      margin-top: 7px;
+    }
+
+    .code-tag {
+      font-family: 'Courier New', monospace;
+      font-size: 0.72rem;
+      color: var(--teal);
+      background: rgba(45, 212, 191, 0.08);
+      border: 1px solid rgba(45, 212, 191, 0.15);
+      border-radius: 4px;
+      padding: 0.1rem 0.35rem;
+    }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      width: 100%;
+      padding-top: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .page-wrapper {
+        padding: 1.5rem 1rem 3rem;
+        gap: 2rem;
+      }
+
+      .robot-scene {
+        width: 240px;
+        height: 280px;
+        transform: scale(0.85);
+      }
+
+      .chat-messages {
+        height: 260px;
+      }
+
+      .suggestions {
+        display: none;
+      }
+
+      .state-badge {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="page-wrapper">
+    <!-- Header -->
+    <header class="site-header">
+      <div class="logo">Xeno <span>AI</span></div>
+      <div class="header-badge">
+        <div class="status-dot"></div>
+        Online
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <div class="hero-text">
+      <h1>Meet Xeno</h1>
+      <p>Your intelligent developer assistant. Ask me anything about code, frameworks, or career advice.</p>
+    </div>
+
+    <!-- Robot Scene -->
+    <div class="robot-scene" id="robotScene" title="Click to chat with Xeno">
+      <canvas id="particle-canvas"></canvas>
+      <div class="robot-aura"></div>
+
+      <div class="orbit-ring orbit1">
+        <div class="orbit-dot" style="background: var(--cyan);"></div>
+      </div>
+      <div class="orbit-ring orbit2">
+        <div class="orbit-dot" style="background: var(--teal); top: auto; bottom: -3px;"></div>
+      </div>
+
+      <div class="robot-wrap" id="robotWrap">
+        <!-- Head -->
+        <div class="robot-head">
+          <div class="antenna">
+            <div class="antenna-ball"></div>
+            <div class="antenna-stick"></div>
+          </div>
+          <div class="ear ear-left"></div>
+          <div class="ear ear-right"></div>
+
+          <div class="eyes">
+            <div class="eye" id="eye-left">
+              <div class="eyelid" id="eyelid-left"></div>
+            </div>
+            <div class="eye" id="eye-right">
+              <div class="eyelid" id="eyelid-right"></div>
+            </div>
+          </div>
+
+          <div class="mouth-wrap">
+            <div class="mouth">
+              <div class="mouth-bar" id="mouth-bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arms + Body -->
+        <div class="arms">
+          <div class="arm arm-left">
+            <div class="hand"></div>
+          </div>
+          <div class="arm arm-right">
+            <div class="hand"></div>
+          </div>
+        </div>
+
+        <div class="robot-body">
+          <div class="chest-panel">
+            <div class="chest-row">
+              <div class="chest-light"></div>
+              <div class="chest-light"></div>
+              <div class="chest-light"></div>
+            </div>
+            <div class="chest-row">
+              <div class="chest-light"></div>
+              <div class="chest-light"></div>
+              <div class="chest-light"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="legs">
+          <div class="leg">
+            <div class="foot"></div>
+          </div>
+          <div class="leg">
+            <div class="foot"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="robot-shadow"></div>
+      <div class="state-badge" id="stateBadge">Say hi!</div>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-section" id="chatSection">
+      <div class="chat-header">
+        <div class="chat-header-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+        </div>
+        <div class="chat-header-text">
+          <h2>Chat with Xeno</h2>
+          <p>AI assistant — responds instantly</p>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg bot">
+          <div class="msg-avatar">X</div>
+          <div class="msg-bubble">Hey there! I'm <strong>Xeno</strong>, your AI developer assistant. I can help you with
+            code questions, tech stack advice, debugging tips, and more. What are you working on today?</div>
+        </div>
+      </div>
+
+      <div class="suggestions" id="suggestions">
+        <button class="chip" onclick="sendChip(this)">Explain async/await</button>
+        <button class="chip" onclick="sendChip(this)">Best practices for REST APIs</button>
+        <button class="chip" onclick="sendChip(this)">What is machine learning?</button>
+        <button class="chip" onclick="sendChip(this)">React vs Vue</button>
+        <button class="chip" onclick="sendChip(this)">How does Docker work?</button>
+      </div>
+
+      <div class="chat-input-wrap">
+        <textarea id="chat-input" placeholder="Ask Xeno anything..." rows="1"></textarea>
+        <button class="send-btn" id="sendBtn" title="Send">
+          <svg viewBox="0 0 24 24">
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Integration note -->
+    <div class="integration-note">
+      <h3>Integration Guide</h3>
+      <ul>
+        <li>Embed the robot via <span class="code-tag">&lt;iframe src="xeno-robot.html"&gt;</span> in any portfolio page
+        </li>
+        <li>Replace the <span class="code-tag">xenoRespond()</span> function with a real API call to OpenAI, Gemini, or
+          Claude</li>
+        <li>Use <span class="code-tag">setRobotState('talking'|'thinking'|'idle')</span> to sync robot animations with
+          API responses</li>
+        <li>The robot fires a <span class="code-tag">xeno:message</span> CustomEvent on the window — listen from parent
+          pages via <span class="code-tag">postMessage</span></li>
+      </ul>
+    </div>
+
+    <footer class="page-footer">
+      Xeno &mdash; built with pure HTML, CSS &amp; JS &nbsp;&middot;&nbsp; For Abhiram's portfolio
+    </footer>
+  </div>
+
+  <script>
+    /* ── BACKGROUND PARTICLES ── */
+    (function () {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, stars = [];
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        initStars();
+      }
+
+      function initStars() {
+        stars = [];
+        const n = Math.floor(W * H / 4000);
+        for (let i = 0; i < n; i++) {
+          stars.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            r: Math.random() * 1.2 + 0.2,
+            vx: (Math.random() - 0.5) * 0.08,
+            vy: (Math.random() - 0.5) * 0.08,
+            phase: Math.random() * Math.PI * 2,
+            speed: Math.random() * 0.4 + 0.2,
+            col: Math.random() > 0.6 ? '#38bdf8' : Math.random() > 0.5 ? '#2dd4bf' : '#94a3b8'
+          });
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        const t = Date.now() * 0.001;
+        stars.forEach(s => {
+          s.x += s.vx;
+          s.y += s.vy;
+          if (s.x < 0) s.x = W;
+          if (s.x > W) s.x = 0;
+          if (s.y < 0) s.y = H;
+          if (s.y > H) s.y = 0;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = s.col;
+          ctx.globalAlpha = 0.25 + 0.35 * Math.sin(t * s.speed + s.phase);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      draw();
+    })();
+
+    /* ── ROBOT FLOATING PARTICLES ── */
+    (function () {
+      const canvas = document.getElementById('particle-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+
+      function resizeCanvas() {
+        const scene = document.getElementById('robotScene');
+        const rect = scene.getBoundingClientRect();
+        canvas.width = rect.width + 80;
+        canvas.height = rect.height + 80;
+      }
+
+      function spawnParticle() {
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 80 + Math.random() * 60;
+        particles.push({
+          x: cx + Math.cos(angle) * dist * 0.3,
+          y: cy + Math.sin(angle) * dist * 0.3,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: -Math.random() * 0.8 - 0.3,
+          life: 1,
+          decay: Math.random() * 0.008 + 0.005,
+          r: Math.random() * 2 + 1,
+          col: Math.random() > 0.5 ? '#38bdf8' : '#2dd4bf'
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (Math.random() < 0.3) spawnParticle();
+
+        particles = particles.filter(p => p.life > 0);
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= p.decay;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.col;
+          ctx.globalAlpha = p.life * 0.6;
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(draw);
+      }
+
+      window.addEventListener('load', () => { resizeCanvas(); draw(); });
+      window.addEventListener('resize', resizeCanvas);
+    })();
+
+    /* ── EYE BLINKING ── */
+    function blink() {
+      const eyelidL = document.getElementById('eyelid-left');
+      const eyelidR = document.getElementById('eyelid-right');
+      const eyeL = document.getElementById('eye-left');
+      const eyeR = document.getElementById('eye-right');
+
+      eyeL.classList.add('blink');
+      eyeR.classList.add('blink');
+      eyelidL.style.transform = 'scaleY(1)';
+      eyelidR.style.transform = 'scaleY(1)';
+
+      setTimeout(() => {
+        eyeL.classList.remove('blink');
+        eyeR.classList.remove('blink');
+        eyelidL.style.transform = 'scaleY(0)';
+        eyelidR.style.transform = 'scaleY(0)';
+      }, 140);
+
+      // Schedule next blink
+      const nextBlink = 2500 + Math.random() * 3500;
+      setTimeout(blink, nextBlink);
+    }
+    setTimeout(blink, 1500);
+
+    /* ── ROBOT STATE ── */
+    let currentState = 'idle';
+    const scene = document.getElementById('robotScene');
+    const stateBadge = document.getElementById('stateBadge');
+
+    const stateConfig = {
+      idle: { badge: 'Say hi!', class: '' },
+      thinking: { badge: 'Thinking...', class: 'thinking' },
+      talking: { badge: 'Responding', class: 'talking' },
+      hover: { badge: 'Hello!', class: '' }
+    };
+
+    function setRobotState(state) {
+      currentState = state;
+      scene.classList.remove('thinking', 'talking');
+      const cfg = stateConfig[state] || stateConfig.idle;
+      if (cfg.class) scene.classList.add(cfg.class);
+      stateBadge.textContent = cfg.badge;
+    }
+
+    /* ── CHAT BOT LOGIC ── */
+    const knowledgeBase = [
+      {
+        patterns: ['hello', 'hi', 'hey', 'greetings', 'sup'],
+        responses: [
+          "Hello! Great to meet you. I'm Xeno, your AI developer companion. What can I help you build today?",
+          "Hey there! Ready to tackle some code together? What's on your mind?",
+          "Hi! I'm here and ready to help. Ask me anything about tech, code, or career advice!"
+        ]
+      },
+      {
+        patterns: ['async', 'await', 'promise', 'asynchronous'],
+        responses: [
+          "Great question! <strong>async/await</strong> is syntactic sugar over Promises in JavaScript.\n\n<code>async function fetchData() {\n  const data = await fetch('/api');\n  return data.json();\n}</code>\n\nKey points:\n• <code>async</code> makes a function return a Promise\n• <code>await</code> pauses execution until the Promise resolves\n• Always wrap in try/catch for error handling\n• Cleaner than chaining .then() calls"
+        ]
+      },
+      {
+        patterns: ['machine learning', 'ml', 'ai', 'artificial intelligence'],
+        responses: [
+          "Machine Learning is a subset of AI where algorithms learn patterns from data rather than being explicitly programmed.\n\n<strong>Core types:</strong>\n• <strong>Supervised</strong> — labeled training data (classification, regression)\n• <strong>Unsupervised</strong> — finds hidden patterns (clustering)\n• <strong>Reinforcement</strong> — learns via rewards/penalties\n\nPopular libraries: TensorFlow, PyTorch, Scikit-learn"
+        ]
+      },
+      {
+        patterns: ['react', 'vue', 'angular', 'framework', 'frontend'],
+        responses: [
+          "<strong>React vs Vue vs Angular — quick breakdown:</strong>\n\n• <strong>React</strong> — Library, not full framework. Huge ecosystem, JSX, great for large SPAs. Meta maintains it.\n\n• <strong>Vue</strong> — Progressive framework. Gentle learning curve, great docs. Best for incremental adoption.\n\n• <strong>Angular</strong> — Full opinionated framework. TypeScript-first, best for enterprise apps with teams.\n\nFor a portfolio? React is probably your best bet for job market appeal."
+        ]
+      },
+      {
+        patterns: ['docker', 'container', 'containerize'],
+        responses: [
+          "<strong>Docker</strong> packages your app + all its dependencies into a lightweight container that runs consistently everywhere.\n\nCore concepts:\n• <strong>Image</strong> — Blueprint (like a class)\n• <strong>Container</strong> — Running instance (like an object)\n• <strong>Dockerfile</strong> — Recipe to build an image\n• <strong>Docker Compose</strong> — Orchestrate multi-container apps\n\nBig win: 'It works on my machine' becomes 'It works everywhere'."
+        ]
+      },
+      {
+        patterns: ['rest', 'api', 'endpoint', 'http'],
+        responses: [
+          "<strong>REST API best practices:</strong>\n\n• Use nouns for resources: <code>GET /users/{id}</code> not <code>/getUser</code>\n• Correct HTTP verbs: GET (read), POST (create), PUT (update), DELETE (remove)\n• Return proper status codes: 200, 201, 400, 401, 404, 500\n• Version your API: <code>/api/v1/...</code>\n• Paginate large collections\n• Use JSON consistently\n• Secure with JWT or OAuth2\n• Document with OpenAPI/Swagger"
+        ]
+      },
+      {
+        patterns: ['python', 'tensorflow', 'scikit', 'pandas', 'numpy'],
+        responses: [
+          "Python is the dominant language for data science and ML. Here's the core stack:\n\n• <strong>NumPy</strong> — N-dimensional arrays, fast math ops\n• <strong>Pandas</strong> — DataFrames for data manipulation\n• <strong>Matplotlib/Seaborn</strong> — Data visualization\n• <strong>Scikit-learn</strong> — Classical ML algorithms\n• <strong>TensorFlow/PyTorch</strong> — Deep learning\n\nTip: Start with Pandas + Scikit-learn before diving into deep learning!"
+        ]
+      },
+      {
+        patterns: ['java', 'spring', 'backend'],
+        responses: [
+          "Java is rock-solid for backend development! Key ecosystem:\n\n• <strong>Spring Boot</strong> — Most popular Java framework for REST APIs\n• <strong>Maven/Gradle</strong> — Build tools\n• <strong>JPA/Hibernate</strong> — ORM for databases\n• <strong>JWT</strong> — Auth tokens\n\nJava's strong typing + Spring Boot's auto-configuration make it excellent for scalable enterprise applications."
+        ]
+      },
+      {
+        patterns: ['job', 'career', 'resume', 'interview', 'hire'],
+        responses: [
+          "Great question! Here's career advice for a developer:\n\n• <strong>Portfolio</strong> — Build 3-4 solid projects with real demos, not just CRUD apps\n• <strong>GitHub</strong> — Keep it active; quality over quantity\n• <strong>LinkedIn</strong> — Optimize for keywords in your target role\n• <strong>LeetCode</strong> — 100+ problems for interviews, focus on arrays, trees, graphs\n• <strong>Networking</strong> — 70%+ of jobs are via referrals. Attend meetups!\n• <strong>Specialization</strong> — AI/ML engineers are in high demand right now"
+        ]
+      },
+      {
+        patterns: ['git', 'github', 'version control', 'branch'],
+        responses: [
+          "<strong>Essential Git workflow:</strong>\n\n<code>git init / git clone</code> — Start a repo\n<code>git add . && git commit -m 'msg'</code> — Save changes\n<code>git branch feature/x</code> — Create a branch\n<code>git push origin feature/x</code> — Push to remote\n<code>git pull --rebase</code> — Sync with main\n\nBest practice: Use feature branches, write meaningful commit messages, and squash before merging to keep history clean."
+        ]
+      },
+      {
+        patterns: ['thanks', 'thank you', 'helpful', 'great', 'awesome', 'nice'],
+        responses: [
+          "Happy to help! That's what I'm here for. Is there anything else you'd like to explore?",
+          "Glad I could assist! Feel free to ask more anytime. Learning never stops!",
+          "You're welcome! Keep building cool things. Anything else on your mind?"
+        ]
+      },
+      {
+        patterns: ['who are you', 'what are you', 'your name', 'xeno'],
+        responses: [
+          "I'm <strong>Xeno</strong> — an AI assistant built for Abhiram's developer portfolio. I'm designed to help with code questions, tech explanations, and career guidance.\n\nI'm powered by a built-in knowledge base and can be connected to a live AI API (like Claude or OpenAI) for full conversational capabilities!"
+        ]
+      },
+      {
+        patterns: ['css', 'styling', 'design', 'tailwind'],
+        responses: [
+          "<strong>Modern CSS tips:</strong>\n\n• Use CSS custom properties (variables) for theming\n• CSS Grid + Flexbox cover 95% of layouts\n• <code>clamp()</code> for fluid typography\n• <code>aspect-ratio</code> for responsive media\n• Container queries for component-level responsiveness\n• <strong>Tailwind CSS</strong> — utility-first, excellent DX, loved by React devs\n\nFor animations: prefer CSS transitions/keyframes over JS for performance. Use <code>will-change</code> sparingly."
+        ]
+      }
+    ];
+
+    function xenoRespond(message) {
+      const lower = message.toLowerCase();
+
+      for (const entry of knowledgeBase) {
+        if (entry.patterns.some(p => lower.includes(p))) {
+          const responses = entry.responses;
+          return responses[Math.floor(Math.random() * responses.length)];
+        }
+      }
+
+      // Fallback
+      const fallbacks = [
+        "That's an interesting question! While I don't have a specific answer in my knowledge base right now, I'd suggest checking the official docs or MDN Web Docs for technical topics. Want to ask me something else?",
+        "Hmm, I'm not sure about that specific topic. Try rephrasing or ask me about JavaScript, Python, ML, REST APIs, Docker, or career advice — those are my strong suits!",
+        "Great question! I'm still learning about that. For comprehensive answers, I'd recommend checking Stack Overflow, the official documentation, or connecting me to a live AI API for full capabilities."
+      ];
+      return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    }
+
+    /* ── CHAT UI ── */
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('sendBtn');
+    let isBusy = false;
+
+    function scrollToBottom() {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addMessage(content, role) {
+      const div = document.createElement('div');
+      div.className = `msg ${role}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'msg-avatar';
+      avatar.textContent = role === 'bot' ? 'X' : 'U';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'msg-bubble';
+      bubble.innerHTML = content.replace(/\n/g, '<br>').replace(/`([^`]+)`/g, '<code>$1</code>');
+
+      div.appendChild(avatar);
+      div.appendChild(bubble);
+      chatMessages.appendChild(div);
+      scrollToBottom();
+    }
+
+    function showTyping() {
+      const div = document.createElement('div');
+      div.className = 'msg bot';
+      div.id = 'typing-indicator';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'msg-avatar';
+      avatar.textContent = 'X';
+
+      const dots = document.createElement('div');
+      dots.className = 'typing-dots';
+      dots.innerHTML = '<span></span><span></span><span></span>';
+
+      div.appendChild(avatar);
+      div.appendChild(dots);
+      chatMessages.appendChild(div);
+      scrollToBottom();
+    }
+
+    function removeTyping() {
+      const el = document.getElementById('typing-indicator');
+      if (el) el.remove();
+    }
+
+    async function sendMessage(text) {
+      if (!text.trim() || isBusy) return;
+      isBusy = true;
+
+      addMessage(text, 'user');
+      chatInput.value = '';
+      chatInput.style.height = 'auto';
+
+      // Hide suggestions after first message
+      document.getElementById('suggestions').style.display = 'none';
+
+      // Robot goes to thinking state
+      setRobotState('thinking');
+      showTyping();
+
+      // Simulate thinking delay (300–900ms)
+      const delay = 300 + Math.random() * 600;
+      await new Promise(r => setTimeout(r, delay));
+
+      const response = xenoRespond(text);
+      removeTyping();
+
+      // Robot talks while "typing" the response
+      setRobotState('talking');
+
+      addMessage(response, 'bot');
+
+      // Dispatch event for parent page integration
+      window.dispatchEvent(new CustomEvent('xeno:message', {
+        detail: { role: 'assistant', content: response }
+      }));
+
+      // Talk animation lasts proportional to response length
+      const talkDuration = Math.min(2000, response.length * 12);
+      setTimeout(() => {
+        setRobotState('idle');
+        isBusy = false;
+      }, talkDuration);
+    }
+
+    sendBtn.addEventListener('click', () => sendMessage(chatInput.value));
+
+    chatInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage(chatInput.value);
+      }
+    });
+
+    // Auto-resize textarea
+    chatInput.addEventListener('input', () => {
+      chatInput.style.height = 'auto';
+      chatInput.style.height = chatInput.scrollHeight + 'px';
+    });
+
+    // Chip suggestions
+    function sendChip(btn) {
+      const text = btn.textContent;
+      chatInput.value = text;
+      sendMessage(text);
+    }
+
+    // Robot click interaction
+    scene.addEventListener('click', () => {
+      if (!isBusy) {
+        chatInput.focus();
+        setRobotState('hover');
+        setTimeout(() => setRobotState('idle'), 1200);
+      }
+    });
+  </script>
+</body>
+
+</html>

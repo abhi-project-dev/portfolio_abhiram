@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abhiram Thallapally | AI/ML & Full-Stack Developer</title>
+  <meta name="description"
+    content="Abhiram Thallapally's portfolio: AI/ML, full-stack projects, data tools, certificates, and contact details." />
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23060e18'/%3E%3Ctext x='32' y='39' text-anchor='middle' font-family='Arial,sans-serif' font-size='24' font-weight='700' fill='%2338bdf8'%3EAT%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
+  <style>
+    .xeno-assistant-frame {
+      position: fixed;
+      right: .5rem;
+      bottom: .5rem;
+      width: 152px;
+      height: 156px;
+      border: 0;
+      background: transparent;
+      z-index: 9999;
+      color-scheme: dark;
+      transition: width 180ms ease, height 180ms ease;
+    }
+
+    .xeno-assistant-frame.is-open {
+      width: min(440px, calc(100vw - 1rem));
+      height: min(720px, calc(100vh - 1rem));
+    }
+
+    @media (max-width: 560px) {
+      .xeno-assistant-frame.is-open {
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header" data-header>
+    <div class="shell nav-shell">
+      <a class="brand" href="#top" aria-label="Abhiram portfolio home">
+        <span class="brand__mark">AT</span>
+        <span class="brand__text">
+          <strong>Abhiram Thallapally</strong>
+          <small>AI/ML · Full-Stack Developer</small>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#projects">Projects</a>
+        <a href="#education">Education</a>
+        <a href="#certificates">Certificates</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a class="button button--ghost button--small" href="./CV_Abhiram.pdf" download>Download CV</a>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ── HERO / ABOUT ── -->
+    <section class="hero shell reveal" id="top">
+      <div class="hero__copy card-base">
+        <p class="eyebrow">AI/ML · Full-Stack · 2025 Graduate</p>
+        <h1>Turning ideas into <span>useful software.</span></h1>
+        <p class="hero__lede">
+          I’m Abhiram Thallapally, a Computer Science graduate focused on AI, machine learning, and full-stack
+          development. I enjoy taking an idea from data, model, or backend logic all the way to a clean interface that
+          people can actually use. I’m currently looking for software, AI/ML, full-stack, and data analytics
+          opportunities.
+        </p>
+        <div class="hero__actions">
+          <a class="button" href="#projects">View Projects</a>
+          <a class="button button--ghost" href="#certificates">Certificates</a>
+          <a class="button button--email" href="mailto:abhiramthalapally0@gmail.com">Email Me</a>
+        </div>
+        <dl class="hero__stats" aria-label="Portfolio highlights">
+          <div>
+            <dt>Projects</dt>
+            <dd id="project-count">15</dd>
+          </div>
+          <div>
+            <dt>Certificates</dt>
+            <dd>05</dd>
+          </div>
+          <div>
+            <dt>Model Accuracy</dt>
+            <dd>90%+</dd>
+          </div>
+          <div>
+            <dt>Graduation</dt>
+            <dd>2025</dd>
+          </div>
+        </dl>
+      </div>
+
+      <aside class="hero__panel card-base reveal" id="about">
+        <div class="hero__panel-top">
+          <img class="hero__avatar" src="./Avatar.png" alt="Portrait of Abhiram Thallapally" />
+          <div>
+            <p class="hero__panel-label">Current Focus</p>
+            <h2>Machine learning projects, Java full-stack work, and interfaces that are simple to try.</h2>
+          </div>
+        </div>
+        <div class="hero__signal-list">
+          <div class="signal-card">
+            <span>Primary Stack</span>
+            <strong>Python · Java · JavaScript · React · MySQL</strong>
+          </div>
+          <div class="signal-card">
+            <span>Notable Result</span>
+            <strong>90%+ accuracy on thyroid disease classification model</strong>
+          </div>
+          <div class="signal-card">
+            <span>Work Style</span>
+            <strong>Curious, steady, detail-oriented, and comfortable learning fast</strong>
+          </div>
+        </div>
+        <ul class="hero__meta">
+          <li><span>Phone</span><a href="tel:+919502523875">+91 95025 23875</a></li>
+          <li><span>Email</span><a href="mailto:abhiramthalapally0@gmail.com">abhiramthalapally0@gmail.com</a></li>
+          <li><span>GitHub</span><a href="https://github.com/abhi-project-dev" target="_blank"
+              rel="noreferrer">github.com/abhi-project-dev</a></li>
+          <li><span>LinkedIn</span><a href="https://www.linkedin.com/in/abhiram-thallapally" target="_blank"
+              rel="noreferrer">linkedin.com/in/abhiram-thallapally</a></li>
+        </ul>
+      </aside>
+    </section>
+
+    <hr class="section-divider shell" />
+
+    <!-- ── SKILLS ── -->
+    <section class="section shell reveal" id="skills" data-section>
+      <div class="section-heading">
+        <p class="eyebrow">Technical Skills</p>
+        <h2>The tools I reach for when I’m building.</h2>
+        <p>These skills come from coursework, internships, and projects where the goal was to make something usable, not
+          just check a box.</p>
+      </div>
+      <div class="skills-grid">
+        <article class="skill-card card-base">
+          <h3>Programming Languages</h3>
+          <p>Languages I use for models, backend logic, data work, and browser interfaces.</p>
+          <div class="tag-cloud">
+            <span>Python</span><span>Java</span><span>JavaScript</span><span>SQL</span>
+          </div>
+        </article>
+        <article class="skill-card card-base">
+          <h3>Core Concepts</h3>
+          <p>The basics I rely on when writing cleaner code and thinking through tradeoffs.</p>
+          <div class="tag-cloud">
+            <span>Data Structures</span><span>Algorithms</span><span>OOP</span><span>Optimization Techniques</span>
+          </div>
+        </article>
+        <article class="skill-card card-base">
+          <h3>ML &amp; Data Science</h3>
+          <p>Cleaning data, training models, checking results, and turning outputs into something understandable.</p>
+          <div class="tag-cloud">
+            <span>TensorFlow</span><span>Scikit-learn</span><span>Pandas</span><span>NumPy</span><span>Regression</span><span>Classification</span><span>Model
+              Evaluation</span>
+          </div>
+        </article>
+        <article class="skill-card card-base">
+          <h3>Data Analysis &amp; Visualization</h3>
+          <p>Exploring data and presenting insights in a way that is easier to read and act on.</p>
+          <div class="tag-cloud">
+            <span>Tableau</span><span>Power BI</span><span>Matplotlib</span><span>Statistical Analysis</span><span>Data
+              Visualization</span>
+          </div>
+        </article>
+        <article class="skill-card card-base">
+          <h3>Software Development</h3>
+          <p>Building the pieces around an idea: UI, APIs, auth, testing, and the small details that make it work.</p>
+          <div class="tag-cloud">
+            <span>HTML5</span><span>CSS3</span><span>React.js</span><span>Node.js</span><span>REST APIs</span><span>JWT
+              Auth</span><span>Agile</span><span>SDLC</span><span>Debugging</span><span>Testing</span>
+          </div>
+        </article>
+        <article class="skill-card card-base">
+          <h3>Databases</h3>
+          <p>Storing, querying, and organizing application data with relational databases.</p>
+          <div class="tag-cloud">
+            <span>MySQL</span><span>DBMS</span>
+          </div>
+        </article>
+        <article class="skill-card card-base">
+          <h3>Tools &amp; Technologies</h3>
+          <p>The everyday tools I use to write, debug, version, and ship projects.</p>
+          <div class="tag-cloud">
+            <span>Git</span><span>GitHub</span><span>VS
+              Code</span><span>PyCharm</span><span>Eclipse</span><span>Docker</span><span>Deployment</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <hr class="section-divider shell" />
+
+    <!-- ── PROJECTS ── -->
+    <section class="section shell reveal" id="projects" data-section>
+      <div class="section-heading">
+        <p class="eyebrow">Projects</p>
+        <h2>Projects that show how I think and build.</h2>
+        <p>Some are AI/ML experiments, some are full-stack tools, and some are browser demos. I try to keep the same
+          standard across all of them: make it work, make it clear, and make it easy to try.</p>
+      </div>
+
+      <div class="project-filter" aria-label="Project filters">
+        <button class="filter-button is-active" data-project-filter="all" type="button">All</button>
+        <button class="filter-button" data-project-filter="ai" type="button">AI / ML</button>
+        <button class="filter-button" data-project-filter="fullstack" type="button">Full Stack</button>
+        <button class="filter-button" data-project-filter="web" type="button">Web / API</button>
+        <button class="filter-button" data-project-filter="finance" type="button">Finance</button>
+        <button class="filter-button" data-project-filter="games" type="button">Games</button>
+      </div>
+
+      <div class="projects-grid">
+
+        <article class="project-card card-base" data-project-category="ai">
+          <div class="project-preview project-preview--thyroid" aria-hidden="true">
+            <div class="preview-chip">AI / ML</div>
+            <div class="preview-score"><strong>90%+</strong><span>accuracy</span></div>
+            <div class="preview-bars"><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Featured Project · AI/ML</p>
+              <h3>Interactive Thyroid Disease Prediction</h3>
+            </div>
+            <p>A machine learning project that predicts thyroid disorder risk from user inputs and shows the result in a
+              simple web interface.</p>
+            <ul class="point-list">
+              <li>Trained using Python, Scikit-learn, Pandas, and NumPy on real-world thyroid datasets.</li>
+              <li>Added a clear form so users can enter symptoms and get an instant prediction.</li>
+              <li>Shows confidence scores next to the prediction so the result feels easier to understand.</li>
+            </ul>
+            <div class="tag-cloud"><span>Python</span><span>Scikit-learn</span><span>Pandas</span><span>NumPy</span>
+            </div>
+            <div class="project-links">
+              <a class="button button--small" href="./thyroid-predictor.html" target="_blank" rel="noreferrer">Open
+                Demo</a>
+              <a class="button button--ghost button--small"
+                href="https://github.com/abhi-project-dev/Interactive-Thyroid-Disease-Prediction-using-Machine-Learning"
+                target="_blank" rel="noreferrer">GitHub</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="fullstack">
+          <div class="project-preview project-preview--budget" aria-hidden="true">
+            <div class="preview-chip">Full Stack · Java</div>
+            <div class="preview-window"><span></span><span></span><span></span></div>
+            <div class="preview-chart"><i></i><i></i></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Featured Project · Full-Stack</p>
+              <h3>Interactive Budgeting Tool</h3>
+            </div>
+            <p>A budgeting app for tracking income, expenses, savings goals, and monthly spending patterns in one
+              place.</p>
+            <ul class="point-list">
+              <li>Built with Java, Spring Boot, React.js, and MySQL across the app stack.</li>
+              <li>Added JWT authentication for user accounts.</li>
+              <li>Created dashboards for category breakdowns and monthly summaries.</li>
+              <li>Tested it against manual tracking and made the workflow noticeably faster.</li>
+            </ul>
+            <div class="tag-cloud"><span>Java</span><span>Spring Boot</span><span>React</span><span>MySQL</span></div>
+            <div class="project-links">
+              <a class="button button--small" href="./budgeting-tool.html" target="_blank" rel="noreferrer">Open
+                Demo</a>
+              <a class="button button--ghost button--small"
+                href="https://github.com/abhi-project-dev/Interactive-Budgeting-Tool-Using-Java-Full-Stack-Development"
+                target="_blank" rel="noreferrer">GitHub</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="web">
+          <div class="project-preview project-preview--portfolio" aria-hidden="true">
+            <div class="preview-chip">Frontend · Portfolio</div>
+            <div class="preview-portfolio-dots"><span></span><span></span><span></span></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Portfolio Project · Frontend</p>
+              <h3>Personal Developer Portfolio Website</h3>
+            </div>
+            <p>A single-page portfolio built to keep my projects, certificates, resume, and contact links easy to
+              browse.</p>
+            <ul class="point-list">
+              <li>Built with vanilla HTML5, CSS3, and JavaScript.</li>
+              <li>Scroll-aware sticky navigation with IntersectionObserver-driven reveal animations.</li>
+              <li>Certificate filter system, responsive layouts, and a dark-first custom design system.</li>
+              <li>Includes a downloadable CV, live demos, and certificate links.</li>
+            </ul>
+            <div class="tag-cloud"><span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Responsive
+                Design</span></div>
+            <div class="project-links">
+              <a class="button button--small" href="./abhiram_portfolio.html">View Demo</a>
+              <a class="button button--ghost button--small" href="https://github.com/abhi-project-dev" target="_blank"
+                rel="noreferrer">GitHub</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="web">
+          <div class="project-preview project-preview--calculator" aria-hidden="true">
+            <div class="preview-chip">API App · Weather</div>
+            <div class="preview-score"><strong>7</strong><span>days</span></div>
+            <div class="preview-bars"><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Demo Project · Web/API</p>
+              <h3>Weather Dashboard</h3>
+            </div>
+            <p>Live weather search with current conditions, seven-day forecast cards, and sunrise/sunset visualization
+              powered by Open-Meteo.</p>
+            <ul class="point-list">
+              <li>Uses public weather APIs to display current and forecast data for searched locations.</li>
+              <li>Organizes temperature, conditions, and daylight timing into fast-scanning dashboard cards.</li>
+              <li>Designed as a responsive, browser-ready demo for API integration work.</li>
+            </ul>
+            <div class="tag-cloud"><span>JavaScript</span><span>HTML</span><span>CSS</span><span>Open-Meteo</span>
+            </div>
+            <div class="project-links">
+              <a class="button button--small" href="./weather-dashboard/index.html" target="_blank"
+                rel="noreferrer">Open Demo</a>
+              <a class="button button--ghost button--small" href="https://github.com/abhi-project-dev/weather-dashboard"
+                target="_blank" rel="noreferrer">GitHub</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="web">
+          <div class="project-preview project-preview--portfolio" aria-hidden="true">
+            <div class="preview-chip">GitHub API</div>
+            <div class="preview-portfolio-dots"><span></span><span></span><span></span></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Demo Project · Tools</p>
+              <h3>GitHub Profile Analyzer</h3>
+            </div>
+            <p>A small dashboard for looking up a GitHub profile and quickly scanning repositories, languages, and
+              activity.</p>
+            <ul class="point-list">
+              <li>Fetches public profile and repository data from the GitHub REST API.</li>
+              <li>Highlights language distribution, activity, repository quality, and portfolio readiness.</li>
+              <li>Useful for quickly reviewing public work without jumping through many GitHub pages.</li>
+            </ul>
+            <div class="tag-cloud"><span>HTML</span><span>CSS Grid</span><span>JavaScript</span><span>GitHub API</span>
+            </div>
+            <div class="project-links">
+              <a class="button button--small" href="./github-profile-analyzer/index.html" target="_blank"
+                rel="noreferrer">Open Demo</a>
+              <a class="button button--ghost button--small" href="https://api.github.com/users/octocat" target="_blank"
+                rel="noreferrer">Sample API</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="ai">
+          <div class="project-preview project-preview--thyroid" aria-hidden="true">
+            <div class="preview-chip">Xeno AI Assistant</div>
+            <div class="preview-score"><strong>AI</strong><span>chat</span></div>
+            <div class="preview-bars"><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Demo Project · AI/Web</p>
+              <h3>Xeno AI Assistant</h3>
+            </div>
+            <p>A built-in assistant that answers questions about my skills, projects, certificates, and contact details.
+            </p>
+            <ul class="point-list">
+              <li>Combines chat UI states with browser speech recognition and text-to-speech interactions.</li>
+              <li>Includes quick prompts, fallbacks, and a responsive conversation layout.</li>
+              <li>Helps visitors find the right project or get a short interview-style summary.</li>
+            </ul>
+            <div class="tag-cloud"><span>JavaScript</span><span>Speech API</span><span>Chat UI</span><span>UX
+                States</span></div>
+            <div class="project-links">
+              <button class="button button--small" data-xeno-open type="button">Open Xeno AI Assistant</button>
+              <a class="button button--ghost button--small" href="ai-chat-interface-with-voice-assistant.html"
+                target="_blank" rel="noreferrer">Xeno AI Assistant Page</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="games">
+          <div class="project-preview project-preview--budget" aria-hidden="true">
+            <div class="preview-chip">Game · Memory</div>
+            <div class="preview-pad"><span>2</span><span>4</span><span>8</span></div>
+            <div class="preview-line"></div>
+            <div class="preview-line preview-line--short"></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Demo Project · Games</p>
+              <h3>Memory Card Game</h3>
+            </div>
+            <p>Clickable card-matching game with move count, timer, shuffle logic, completion state, and touch-friendly
+              controls.</p>
+            <ul class="point-list">
+              <li>Tracks moves and elapsed time while managing card-match state in the browser.</li>
+              <li>Uses responsive grid layouts so the game works across desktop and mobile screens.</li>
+              <li>Includes restart and completion states for a complete playable loop.</li>
+            </ul>
+            <div class="tag-cloud"><span>DOM Events</span><span>State</span><span>CSS Grid</span><span>Game UX</span>
+            </div>
+            <div class="project-links">
+              <a class="button button--small" href="./javascript-project-lab/memory-card-game.html" target="_blank"
+                rel="noreferrer">Open Demo</a>
+              <a class="button button--ghost button--small" href="./javascript-project-lab/snake-game-canvas.html"
+                target="_blank" rel="noreferrer">Snake Game</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="finance">
+          <div class="project-preview project-preview--calculator" aria-hidden="true">
+            <div class="preview-chip">Crypto · API</div>
+            <div class="preview-score"><strong>24h</strong><span>moves</span></div>
+            <div class="preview-chart"><i></i><i></i></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Demo Project · Finance/API</p>
+              <h3>Crypto Dashboard</h3>
+            </div>
+            <p>Track live crypto prices, 24-hour movement, and market profile links with public market data.</p>
+            <ul class="point-list">
+              <li>Displays crypto market snapshots with price, change, and profile-style cards.</li>
+              <li>Designed for fast financial scanning with compact metrics and responsive layout.</li>
+              <li>Connects the finance demo catalog with a working dashboard experience.</li>
+            </ul>
+            <div class="tag-cloud"><span>JavaScript</span><span>Finance UI</span><span>Market
+                Data</span><span>API</span>
+            </div>
+            <div class="project-links">
+              <a class="button button--small" href="./advanced-crypto-dashboard/index.html" target="_blank"
+                rel="noreferrer">Open Demo</a>
+              <a class="button button--ghost button--small"
+                href="https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&amp;ids=bitcoin,ethereum"
+                target="_blank" rel="noreferrer">Sample API</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="games">
+          <div class="project-preview project-preview--portfolio" aria-hidden="true">
+            <div class="preview-chip">Canvas Game</div>
+            <div class="preview-portfolio-dots"><span></span><span></span><span></span></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Demo Project · Games</p>
+              <h3>Snake Game (Canvas)</h3>
+            </div>
+            <p>Canvas-based Snake with score tracking, pause/restart controls, collision detection, and mobile direction
+              buttons.</p>
+            <ul class="point-list">
+              <li>Implements a browser game loop with movement, food spawning, and collision rules.</li>
+              <li>Supports keyboard input plus mobile-friendly direction controls.</li>
+              <li>Includes score state, pause behavior, and restart flow.</li>
+            </ul>
+            <div class="tag-cloud"><span>Canvas</span><span>Animation</span><span>Collision</span><span>Controls</span>
+            </div>
+            <div class="project-links">
+              <a class="button button--small" href="./javascript-project-lab/snake-game-canvas.html" target="_blank"
+                rel="noreferrer">Open Demo</a>
+              <a class="button button--ghost button--small" href="./javascript-project-lab/memory-card-game.html"
+                target="_blank" rel="noreferrer">Memory Game</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="games">
+          <div class="project-preview project-preview--thyroid" aria-hidden="true">
+            <div class="preview-chip">AI Opponent</div>
+            <div class="preview-pad"><span>X</span><span>O</span><span>AI</span></div>
+            <div class="preview-line"></div>
+            <div class="preview-line preview-line--short"></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Demo Project · AI/Games</p>
+              <h3>Tic Tac Toe (AI Opponent)</h3>
+            </div>
+            <p>Single-player Tic Tac Toe with a strategic AI opponent, win/draw states, score tracking, and crisp board
+              interactions.</p>
+            <ul class="point-list">
+              <li>Uses game-state evaluation for an AI opponent with strategic moves.</li>
+              <li>Tracks wins, losses, and draws across repeated rounds.</li>
+              <li>Builds a compact interactive game UI with immediate feedback states.</li>
+            </ul>
+            <div class="tag-cloud"><span>Minimax</span><span>JavaScript</span><span>State</span><span>AI Logic</span>
+            </div>
+            <div class="project-links">
+              <a class="button button--small" href="./javascript-project-lab/tic-tac-toe-ai-opponent.html"
+                target="_blank" rel="noreferrer">Open Demo</a>
+              <a class="button button--ghost button--small" href="./javascript-project-lab/memory-card-game.html"
+                target="_blank" rel="noreferrer">Game Lab</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="ai">
+          <div class="project-preview project-preview--budget" aria-hidden="true">
+            <div class="preview-chip">Prompt UI</div>
+            <div class="preview-chart"><i></i><i></i></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Demo Project · AI/Web</p>
+              <h3>Image Generator UI</h3>
+            </div>
+            <p>A prompt-based canvas experiment that turns text into generated visual patterns.</p>
+            <ul class="point-list">
+              <li>Turns user prompts into visual canvas output with deterministic generation logic.</li>
+              <li>Includes prompt controls, output states, and a creative-tool style layout.</li>
+              <li>Structured so an image API could be added later.</li>
+            </ul>
+            <div class="tag-cloud"><span>Canvas</span><span>Prompt UX</span><span>Generative
+                UI</span><span>JavaScript</span>
+            </div>
+            <div class="project-links">
+              <a class="button button--small" href="./javascript-project-lab/image-generator-ui.html" target="_blank"
+                rel="noreferrer">Open Demo</a>
+              <button class="button button--ghost button--small" data-xeno-open type="button">Xeno AI Assistant</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="finance">
+          <div class="project-preview project-preview--calculator" aria-hidden="true">
+            <div class="preview-chip">Finance Tool</div>
+            <div class="preview-pad"><span>FD</span><span>EMI</span><span>SIP</span></div>
+            <div class="preview-line"></div>
+            <div class="preview-line preview-line--short"></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Additional Project · Finance</p>
+              <h3>Financial Calculator Web App</h3>
+            </div>
+            <p>A client-side financial planning tool that calculates Fixed Deposit returns, EMI repayment schedules, and
+              SIP growth projections — all in a single, fast-loading interface.</p>
+            <ul class="point-list">
+              <li>Covers FD maturity, EMI breakdown, SIP projections, and general calculations in one app.</li>
+              <li>Interactive sliders and real-time chart updates for intuitive financial decision support.</li>
+              <li>Fully client-side with no server dependency — results are instant and available offline.</li>
+            </ul>
+            <div class="tag-cloud"><span>JavaScript</span><span>HTML/CSS</span><span>Chart.js</span><span>Finance
+                Logic</span></div>
+            <div class="project-links">
+              <a class="button button--small" href="./calculator.html" target="_blank" rel="noreferrer">Open Demo</a>
+              <a class="button button--ghost button--small"
+                href="https://github.com/abhi-project-dev/Financial-Calculator-Web-App#gateway" target="_blank"
+                rel="noreferrer">GitHub</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="ai">
+          <div class="project-preview project-preview--thyroid" aria-hidden="true">
+            <div class="preview-chip">Regression · ML</div>
+            <div class="preview-score"><strong>RF</strong><span>model</span></div>
+            <div class="preview-bars"><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Demo Project · AI/ML</p>
+              <h3>House Price Prediction</h3>
+            </div>
+            <p>A housing-price demo that estimates property value from common details like area, rooms, location, and
+              age.</p>
+            <ul class="point-list">
+              <li>Uses regression concepts to estimate property pricing from structured housing inputs.</li>
+              <li>Includes explainable output areas for predicted value, confidence, and cost breakdowns.</li>
+              <li>Included directly in the project list so it is easy to find and try.</li>
+            </ul>
+            <div class="tag-cloud"><span>Python</span><span>Scikit-learn</span><span>Pandas</span><span>Random
+                Forest</span></div>
+            <div class="project-links">
+              <a class="button button--small" href="./ml-project-demos/house-price-prediction.html" target="_blank"
+                rel="noreferrer">Open Demo</a>
+              <a class="button button--ghost button--small" href="https://github.com/abhi-project-dev" target="_blank"
+                rel="noreferrer">GitHub</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="ai">
+          <div class="project-preview project-preview--portfolio" aria-hidden="true">
+            <div class="preview-chip">NLP · Classifier</div>
+            <div class="preview-portfolio-dots"><span></span><span></span><span></span></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Demo Project · AI/ML</p>
+              <h3>Spam Email Classifier</h3>
+            </div>
+            <p>TF-IDF plus Naive Bayes pipeline that labels spam vs legitimate messages and highlights key tokens
+              driving the prediction.</p>
+            <ul class="point-list">
+              <li>Demonstrates practical NLP preprocessing and classification through a browser demo.</li>
+              <li>Shows confidence, verdict, and message-analysis cues for clearer interpretation.</li>
+              <li>A compact example of how text classification can support everyday message filtering.</li>
+            </ul>
+            <div class="tag-cloud"><span>Python</span><span>NLTK</span><span>TF-IDF</span><span>Naive Bayes</span>
+            </div>
+            <div class="project-links">
+              <a class="button button--small" href="./ml-project-demos/spam-email-classifier.html" target="_blank"
+                rel="noreferrer">Open Demo</a>
+              <a class="button button--ghost button--small" href="https://github.com/abhi-project-dev" target="_blank"
+                rel="noreferrer">GitHub</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card card-base" data-project-category="ai">
+          <div class="project-preview project-preview--budget" aria-hidden="true">
+            <div class="preview-chip">Recommendation</div>
+            <div class="preview-pad"><span>1</span><span>3</span><span>5</span></div>
+            <div class="preview-line"></div>
+            <div class="preview-line preview-line--short"></div>
+          </div>
+          <div class="project-card__body">
+            <div class="project-card__header">
+              <p class="project-type">Demo Project · AI/ML</p>
+              <h3>Movie Recommendation System</h3>
+            </div>
+            <p>Content-based recommender that suggests similar films using genre, director, and keyword vectors with
+              IMDb scoring insights.</p>
+            <ul class="point-list">
+              <li>Uses similarity-based recommendation concepts to return top movie matches.</li>
+              <li>Shows recommendation reasoning through comparable movie attributes and scores.</li>
+              <li>Designed as an interactive ML demo for exploring recommender-system behavior.</li>
+            </ul>
+            <div class="tag-cloud"><span>Python</span><span>Pandas</span><span>Cosine Similarity</span><span>TMDB
+                API</span></div>
+            <div class="project-links">
+              <a class="button button--small" href="./ml-project-demos/movie-recommendation-system.html" target="_blank"
+                rel="noreferrer">Open Demo</a>
+              <a class="button button--ghost button--small" href="https://github.com/abhi-project-dev" target="_blank"
+                rel="noreferrer">GitHub</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <hr class="section-divider shell" />
+
+    <!-- ── EDUCATION + LANGUAGES + SOFT SKILLS ── -->
+    <section class="section shell journey reveal" id="education" data-section>
+      <div class="journey__intro">
+        <p class="eyebrow">Education &amp; Background</p>
+        <h2>Academic path, languages, and working strengths.</h2>
+      </div>
+      <div class="journey__grid">
+
+        <article class="journey-card card-base">
+          <h3>Education</h3>
+          <div class="edu-item">
+            <strong>Nalla Malla Reddy Engineering College</strong>
+            <span>B.Tech — CSE (AI &amp; ML) · 2022–2025</span>
+            <span class="edu-gpa">GPA 7.6</span>
+          </div>
+          <div class="edu-item">
+            <strong>Government Polytechnic College, Masabtank</strong>
+            <span>Diploma — Automobile Engineering · 2019–2022</span>
+            <span class="edu-gpa">GPA 8.25</span>
+          </div>
+          <div class="edu-item">
+            <strong>Sarvepalli Radha Krishna School</strong>
+            <span>SSC (10th Grade) · 2019</span>
+            <span class="edu-gpa">GPA 9.2</span>
+          </div>
+        </article>
+
+        <article class="journey-card card-base">
+          <h3>Languages</h3>
+          <ul class="point-list">
+            <li><strong style="color:var(--ink)">English</strong> — Professional proficiency, used in all project
+              documentation and communication</li>
+            <li><strong style="color:var(--ink)">Telugu</strong> — Native speaker</li>
+            <li><strong style="color:var(--ink)">Hindi</strong> — Conversational understanding</li>
+          </ul>
+        </article>
+
+        <article class="journey-card card-base">
+          <h3>Soft Skills</h3>
+          <ul class="point-list">
+            <li><strong style="color:var(--ink)">Teamwork</strong> — worked effectively in group project environments
+              throughout degree</li>
+            <li><strong style="color:var(--ink)">Analytical Thinking</strong> — data-first mindset applied to both code
+              and decision-making</li>
+            <li><strong style="color:var(--ink)">Problem Solving</strong> — structured approach to debugging, model
+              tuning, and feature design</li>
+            <li><strong style="color:var(--ink)">Communication Skills</strong> — able to explain technical concepts to
+              non-technical audiences</li>
+            <li><strong style="color:var(--ink)">Adaptability</strong> — quickly learns new tools, frameworks, and
+              problem domains</li>
+            <li><strong style="color:var(--ink)">Attention to Detail</strong> — thorough approach to code quality and
+              documentation</li>
+            <li><strong style="color:var(--ink)">Self-Motivated</strong> — independently driven to build, ship, and
+              continuously improve</li>
+          </ul>
+        </article>
+
+      </div>
+    </section>
+
+    <hr class="section-divider shell" />
+
+    <!-- ── CERTIFICATES ── -->
+    <section class="section shell reveal" id="certificates" data-section>
+      <div class="section-heading">
+        <p class="eyebrow">Certifications</p>
+        <h2>Verified credentials in AI, cloud, and security.</h2>
+        <p>All certifications are from accredited programmes. Click any card to open the credential PDF.</p>
+      </div>
+      <div class="cert-filter" aria-label="Filter by category">
+        <button class="filter-button is-active" data-filter="all" type="button">All</button>
+        <button class="filter-button" data-filter="ai-ml" type="button">AI / ML</button>
+        <button class="filter-button" data-filter="cloud" type="button">Cloud</button>
+        <button class="filter-button" data-filter="fullstack" type="button">Full Stack</button>
+        <button class="filter-button" data-filter="security" type="button">Security</button>
+      </div>
+      <div class="cert-grid">
+        <a class="cert-card" data-category="ai-ml" href="./certicates%20internship/IMG_0431.jpg" target="_blank"
+          rel="noreferrer">
+          <span class="cert-card__badge">AI</span>
+          <span class="cert-card__copy">
+            <strong>AI/ML Virtual Internship</strong>
+            <small>AICTE Eduskills · 2023</small>
+          </span>
+        </a>
+        <a class="cert-card" data-category="ai-ml" href="./certicates%20internship/IMG_0431.jpg" target="_blank"
+          rel="noreferrer">
+          <span class="cert-card__badge">AI</span>
+          <span class="cert-card__copy">
+            <strong>Automation Virtual Internship</strong>
+            <small>AICTE Eduskills · 2023</small>
+          </span>
+        </a>
+        <a class="cert-card" data-category="cloud"
+          href="./certicates%20internship/AWS_Academy_Graduate___AWS_Academy_Cloud_Foundations_Badge20230714-28-64jn80.pdf"
+          target="_blank" rel="noreferrer">
+          <span class="cert-card__badge">AWS</span>
+          <span class="cert-card__copy">
+            <strong>AWS Academy Cloud Foundations</strong>
+            <small>Amazon Web Services · 2023</small>
+          </span>
+        </a>
+        <a class="cert-card" data-category="ai-ml"
+          href="./certicates%20internship/AWS_Academy_Graduate___AWS_Academy_Machine_Learning_Foundations_Badge20230714-28-n38jm6.pdf"
+          target="_blank" rel="noreferrer">
+          <span class="cert-card__badge">ML</span>
+          <span class="cert-card__copy">
+            <strong>AWS Machine Learning Foundations</strong>
+            <small>Amazon Web Services · 2023</small>
+          </span>
+        </a>
+        <a class="cert-card" data-category="fullstack"
+          href="./certicates%20internship/1-883ff656-0ca5-427d-94c0-658ddef3b4e7.pdf" target="_blank" rel="noreferrer">
+          <span class="cert-card__badge">FS</span>
+          <span class="cert-card__copy">
+            <strong>Full Stack Development</strong>
+            <small>Infosys Springboard · 2024</small>
+          </span>
+        </a>
+        <a class="cert-card" data-category="security"
+          href="./certicates%20internship/1-194f16d0-a0e1-4dff-8b00-11ac4f7f6bd6.pdf" target="_blank" rel="noreferrer">
+          <span class="cert-card__badge">SEC</span>
+          <span class="cert-card__copy">
+            <strong>Cyber Security Audits</strong>
+            <small>Infosys Springboard · 2024</small>
+          </span>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── FOOTER / CONTACT ── -->
+  <footer class="site-footer reveal" id="contact" data-section>
+    <hr class="section-divider" style="margin-bottom:2rem" />
+    <div class="footer-shell">
+      <div class="footer-copy">
+        <p class="eyebrow">Get In Touch</p>
+        <h2>Open to software, AI/ML, full-stack, and data roles.</h2>
+        <p>
+          If my work feels relevant to what you’re building, I’d be happy to talk. I enjoy learning quickly, working
+          through unclear problems, and turning ideas into usable software.
+        </p>
+        <a class="button button--email" href="mailto:abhiramthalapally0@gmail.com">Send an Email</a>
+      </div>
+      <div class="contact-grid">
+        <a class="contact-card" href="mailto:abhiramthalapally0@gmail.com">
+          <strong>Email</strong>
+          <span>abhiramthalapally0@gmail.com</span>
+        </a>
+        <a class="contact-card" href="tel:+919502523875">
+          <strong>Phone</strong>
+          <span>+91 95025 23875</span>
+        </a>
+        <a class="contact-card" href="https://github.com/abhi-project-dev" target="_blank" rel="noreferrer">
+          <strong>GitHub</strong>
+          <span>github.com/abhi-project-dev</span>
+        </a>
+        <a class="contact-card" href="https://www.linkedin.com/in/abhiram-thallapally" target="_blank" rel="noreferrer">
+          <strong>LinkedIn</strong>
+          <span>linkedin.com/in/abhiram-thallapally</span>
+        </a>
+      </div>
+    </div>
+    <p class="footer-note">© <span id="year"></span> Abhiram Thallapally · Built with HTML, CSS &amp; JavaScript</p>
+  </footer>
+
+  <!-- Xeno AI Assistant shared widget -->
+  <iframe class="xeno-assistant-frame" data-xeno-frame src="./xeno-assistant.html?embed=1" title="Xeno AI Assistant"
+    loading="lazy" allow="microphone" allowtransparency="true" style="background: transparent;"></iframe>
+  <script>
+    function sendXenoFrameCommand(action) {
+      const frame = document.querySelector("[data-xeno-frame]");
+      frame?.contentWindow?.postMessage({ type: "xeno-command", action }, window.location.origin);
+    }
+
+    document.querySelectorAll("[data-xeno-open]").forEach((button) => {
+      button.addEventListener("click", () => sendXenoFrameCommand("open"));
+    });
+
+    window.addEventListener("message", (event) => {
+      if (event.data?.type !== "xeno-frame-state") return;
+      document.querySelector("[data-xeno-frame]")?.classList.toggle("is-open", event.data.open === true);
+    });
+  </script>
+
+  <script src="./app.js" defer></script>
+
+</body>
+
+</html>

@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATS Resume Validator</title>
+  <style>
+    :root {
+      --bg: #050810;
+      --s1: #0c0e1a;
+      --s2: #121526;
+      --s3: #1a1d30;
+      --s4: #222640;
+      --bdr: rgba(255, 255, 255, .06);
+      --bdr2: rgba(255, 255, 255, .11);
+      --bdr3: rgba(255, 255, 255, .18);
+      --ink: #e8eaf6;
+      --dim: #6b7199;
+      --soft: #9ea3c8;
+      --v: #7c6eff;
+      --p: #ff6e9c;
+      --t: #5ef0c0;
+      --y: #ffd46e;
+      --o: #ff9d6e;
+      --mono: 'IBM Plex Mono', monospace;
+      --body: 'Outfit', sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 96px
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--body);
+      overflow-x: hidden;
+      line-height: 1.7;
+      min-height: 100vh
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit
+    }
+
+    /* ── NAV ─────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .8rem 2rem;
+      background: rgba(5, 8, 16, .9);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--bdr);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-family: var(--mono);
+      font-size: .8rem;
+      color: var(--ink)
+    }
+
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--v);
+      box-shadow: 0 0 10px var(--v);
+      animation: pulse 2s ease-in-out infinite
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: .3;
+        transform: scale(.8)
+      }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: .1rem;
+      flex-wrap: wrap
+    }
+
+    .nl {
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .08em;
+      color: var(--dim);
+      padding: .4rem .7rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 160ms ease;
+      cursor: pointer
+    }
+
+    .nl:hover,
+    .nl.on {
+      color: var(--ink);
+      border-color: var(--bdr2);
+      background: var(--s2)
+    }
+
+    .nl.on {
+      color: var(--v)
+    }
+
+    /* ── HERO ─────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 7rem 1.5rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 15%, rgba(124, 110, 255, .08), transparent 28%);
+    }
+
+    .hero-glow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(124, 110, 255, .14), transparent 60%),
+        radial-gradient(ellipse 50% 45% at 80% 70%, rgba(255, 110, 156, .12), transparent 60%),
+        radial-gradient(ellipse 45% 55% at 50% 0%, rgba(94, 240, 192, .08), transparent 55%);
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255, 255, 255, .022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .022) 1px, transparent 1px);
+      background-size: 52px 52px;
+      mask-image: radial-gradient(ellipse 75% 70% at 50% 40%, black 30%, transparent 100%);
+    }
+
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--v);
+      padding: .3rem 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(124, 110, 255, .28);
+      background: rgba(124, 110, 255, .07);
+      display: inline-block;
+      margin-bottom: 1.8rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.6rem, 8.5vw, 5.8rem);
+      font-weight: 700;
+      line-height: .92;
+      letter-spacing: -.04em;
+      margin-bottom: 1.4rem;
+      font-family: var(--mono);
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--v)
+    }
+
+    .hero p {
+      color: var(--dim);
+      font-size: 1rem;
+      max-width: 50ch;
+      margin: 0 auto 2.4rem;
+      line-height: 1.75;
+      font-weight: 300
+    }
+
+    .hero-pills {
+      display: flex;
+      gap: .5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 3rem
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: .75rem;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .pill {
+      font-family: var(--mono);
+      font-size: .64rem;
+      letter-spacing: .08em;
+      padding: .28rem .75rem;
+      border-radius: 999px;
+      border: 1px solid var(--bdr2);
+      color: var(--soft);
+      background: var(--s2)
+    }
+
+    .btn-main {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-family: var(--mono);
+      font-size: .78rem;
+      letter-spacing: .08em;
+      padding: .75rem 1.6rem;
+      border-radius: 9px;
+      border: 1px solid var(--v);
+      background: var(--v);
+      color: #fff;
+      cursor: pointer;
+      transition: all 180ms ease;
+    }
+
+    .btn-main:hover {
+      background: transparent;
+      color: var(--v)
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-family: var(--mono);
+      font-size: .78rem;
+      letter-spacing: .08em;
+      padding: .75rem 1.25rem;
+      border-radius: 9px;
+      border: 1px solid var(--bdr2);
+      background: rgba(255, 255, 255, .03);
+      color: var(--soft);
+      cursor: pointer;
+      transition: all 180ms ease;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--bdr3);
+      color: var(--ink);
+      background: var(--s2)
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--mono);
+      font-size: .6rem;
+      letter-spacing: .14em;
+      color: var(--dim);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .scroll-hint::after {
+      content: '';
+      width: 1px;
+      height: 32px;
+      background: linear-gradient(var(--dim), transparent);
+      animation: drip 1.6s ease-in-out infinite
+    }
+
+    @keyframes drip {
+      0% {
+        opacity: 1;
+        transform: scaleY(1);
+        transform-origin: top
+      }
+
+      100% {
+        opacity: 0;
+        transform: scaleY(0);
+        transform-origin: bottom
+      }
+    }
+
+    /* ── SECTION WRAPPER ─────────────── */
+    .wrap {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 5rem 1.5rem;
+      display: grid;
+      gap: 1.8rem
+    }
+
+    .s-eye {
+      font-family: var(--mono);
+      font-size: .66rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--dim);
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      margin-bottom: .7rem
+    }
+
+    .s-eye::before {
+      content: '';
+      height: 1px;
+      width: 1.4rem;
+      background: var(--dim)
+    }
+
+    .s-head {
+      font-family: var(--mono);
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin-bottom: .6rem
+    }
+
+    .s-sub {
+      color: var(--dim);
+      font-size: .92rem;
+      font-weight: 300;
+      margin-bottom: 3rem;
+      max-width: 56ch
+    }
+
+    /* ── CONTENT SECTIONS ─────────────── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .8rem;
+      margin-top: .3rem
+    }
+
+    .feature-tile,
+    .stack-tile,
+    .flow-step,
+    .insight {
+      border: 1px solid var(--bdr);
+      background: linear-gradient(180deg, rgba(18, 21, 38, .88), rgba(10, 12, 24, .9));
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .feature-k {
+      font-family: var(--mono);
+      font-size: 1.55rem;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--ink);
+      margin-bottom: .25rem
+    }
+
+    .feature-l,
+    .stack-l,
+    .flow-l,
+    .insight-l {
+      font-family: var(--mono);
+      font-size: .62rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: .45rem
+    }
+
+    .feature-copy,
+    .stack-copy,
+    .flow-copy,
+    .insight-copy {
+      color: var(--soft);
+      font-size: .84rem;
+      line-height: 1.55;
+      font-weight: 300
+    }
+
+    .feature-k.v {
+      color: var(--v)
+    }
+
+    .feature-k.p {
+      color: var(--p)
+    }
+
+    .feature-k.t {
+      color: var(--t)
+    }
+
+    .feature-k.y {
+      color: var(--y)
+    }
+
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: .7rem
+    }
+
+    .flow-step {
+      position: relative;
+      min-height: 128px
+    }
+
+    .flow-n {
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--dim);
+      margin-bottom: .7rem
+    }
+
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .8rem
+    }
+
+    .stack-tags {
+      display: flex;
+      gap: .4rem;
+      flex-wrap: wrap;
+      margin-top: .7rem
+    }
+
+    .stack-chip {
+      font-family: var(--mono);
+      font-size: .61rem;
+      padding: .2rem .52rem;
+      border-radius: 999px;
+      color: var(--soft);
+      border: 1px solid var(--bdr2);
+      background: rgba(255, 255, 255, .04)
+    }
+
+    .insight-row {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: .8rem
+    }
+
+    .mini-list {
+      display: grid;
+      gap: .45rem;
+      margin-top: .4rem
+    }
+
+    .mini-item {
+      display: flex;
+      gap: .5rem;
+      color: var(--soft);
+      font-size: .84rem;
+      line-height: 1.5
+    }
+
+    .mini-item::before {
+      content: '•';
+      color: var(--t);
+      font-family: var(--mono)
+    }
+
+    /* ── PROJECT CARD ─────────────────── */
+    .card {
+      border: 1px solid var(--bdr);
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(10, 12, 24, .96), rgba(16, 19, 40, .96));
+      overflow: hidden;
+      transition: transform 220ms ease, border-color 250ms, box-shadow 250ms;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, .14);
+      transform: translateY(-3px);
+      box-shadow: 0 22px 65px rgba(0, 0, 0, .18)
+    }
+
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.2rem;
+      padding: 1.8rem 2rem 1.5rem;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden
+    }
+
+    .card-head::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 300ms
+    }
+
+    .card:hover .card-head::after {
+      opacity: 1
+    }
+
+    .card-head:hover {
+      transform: translateY(-1px)
+    }
+
+    .card-r {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: .7rem;
+      min-width: fit-content
+    }
+
+    .card:hover .card-head::after {
+      opacity: 1
+    }
+
+    .cv .card-head::after {
+      background: radial-gradient(70% 100% at 0 50%, rgba(124, 110, 255, .09), transparent)
+    }
+
+    .cs .card-head::after {
+      background: radial-gradient(70% 100% at 0 50%, rgba(255, 110, 156, .08), transparent)
+    }
+
+    .cm .card-head::after {
+      background: radial-gradient(70% 100% at 0 50%, rgba(94, 240, 192, .07), transparent)
+    }
+
+    .ci .card-head::after {
+      background: radial-gradient(70% 100% at 0 50%, rgba(255, 212, 110, .07), transparent)
+    }
+
+    .ca .card-head::after {
+      background: radial-gradient(70% 100% at 0 50%, rgba(255, 157, 110, .08), transparent)
+    }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: .63rem;
+      letter-spacing: .12em;
+      padding: .24rem .7rem;
+      border-radius: 999px;
+      margin-bottom: .6rem;
+      display: inline-block;
+      text-transform: uppercase
+    }
+
+    .cv .badge {
+      background: rgba(124, 110, 255, .12);
+      color: var(--v);
+      border: 1px solid rgba(124, 110, 255, .22)
+    }
+
+    .cs .badge {
+      background: rgba(255, 110, 156, .12);
+      color: var(--p);
+      border: 1px solid rgba(255, 110, 156, .22)
+    }
+
+    .cm .badge {
+      background: rgba(94, 240, 192, .1);
+      color: var(--t);
+      border: 1px solid rgba(94, 240, 192, .2)
+    }
+
+    .ci .badge {
+      background: rgba(255, 212, 110, .1);
+      color: var(--y);
+      border: 1px solid rgba(255, 212, 110, .2)
+    }
+
+    .ca .badge {
+      background: rgba(255, 157, 110, .1);
+      color: var(--o);
+      border: 1px solid rgba(255, 157, 110, .2)
+    }
+
+    .card-title {
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: .4rem
+    }
+
+    .card-desc {
+      color: var(--dim);
+      font-size: .88rem;
+      font-weight: 300;
+      line-height: 1.6;
+      max-width: 58ch
+    }
+
+    .card-r {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: .7rem;
+      min-width: fit-content
+    }
+
+    .num {
+      font-family: var(--mono);
+      font-size: 2.8rem;
+      font-weight: 700;
+      opacity: .12;
+      line-height: 1
+    }
+
+    .cv .num {
+      color: var(--v)
+    }
+
+    .cs .num {
+      color: var(--p)
+    }
+
+    .cm .num {
+      color: var(--t)
+    }
+
+    .ci .num {
+      color: var(--y)
+    }
+
+    .ca .num {
+      color: var(--o)
+    }
+
+    .togbtn {
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .07em;
+      padding: .42rem .85rem;
+      border-radius: 7px;
+      border: 1px solid var(--bdr2);
+      background: var(--s2);
+      color: var(--soft);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 160ms;
+      display: flex;
+      align-items: center;
+      gap: .35rem
+    }
+
+    .togbtn:hover {
+      border-color: var(--bdr3);
+      color: var(--ink)
+    }
+
+    .arr {
+      display: inline-block;
+      transition: transform 300ms ease
+    }
+
+    .card.open .arr {
+      transform: rotate(180deg)
+    }
+
+    /* ── BODY EXPAND ─────────────────── */
+    .cbody {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 400ms cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .card.open .cbody {
+      grid-template-rows: 1fr
+    }
+
+    .cbody-in {
+      overflow: hidden
+    }
+
+    .csplit {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--bdr)
+    }
+
+    /* ── PIPELINE PANEL ───────────────── */
+    .ppanel {
+      padding: 1.6rem 1.8rem;
+      border-right: 1px solid var(--bdr)
+    }
+
+    .plbl {
+      font-family: var(--mono);
+      font-size: .63rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: .9rem;
+      display: flex;
+      align-items: center;
+      gap: .4rem
+    }
+
+    .plbl-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex: none
+    }
+
+    .cv .plbl-dot {
+      background: var(--v)
+    }
+
+    .cs .plbl-dot {
+      background: var(--p)
+    }
+
+    .cm .plbl-dot {
+      background: var(--t)
+    }
+
+    .ci .plbl-dot {
+      background: var(--y)
+    }
+
+    .ca .plbl-dot {
+      background: var(--o)
+    }
+
+    .steps {
+      display: grid;
+      gap: .42rem
+    }
+
+    .step {
+      display: flex;
+      gap: .7rem;
+      font-size: .84rem;
+      color: var(--soft);
+      line-height: 1.5;
+      align-items: flex-start
+    }
+
+    .sn {
+      font-family: var(--mono);
+      font-size: .62rem;
+      padding: .12rem .38rem;
+      border-radius: 4px;
+      flex: none;
+      margin-top: .2rem
+    }
+
+    .cv .sn {
+      background: rgba(124, 110, 255, .14);
+      color: var(--v)
+    }
+
+    .cs .sn {
+      background: rgba(255, 110, 156, .14);
+      color: var(--p)
+    }
+
+    .cm .sn {
+      background: rgba(94, 240, 192, .12);
+      color: var(--t)
+    }
+
+    .ci .sn {
+      background: rgba(255, 212, 110, .12);
+      color: var(--y)
+    }
+
+    .ca .sn {
+      background: rgba(255, 157, 110, .12);
+      color: var(--o)
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      margin-top: 1rem
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: .62rem;
+      padding: .22rem .55rem;
+      border-radius: 999px;
+      border: 1px solid var(--bdr2);
+      background: var(--s2);
+      color: var(--soft)
+    }
+
+    .bonus {
+      margin-top: 1rem;
+      padding: .8rem .9rem;
+      border-radius: 9px;
+      background: var(--s2);
+      border: 1px solid var(--bdr)
+    }
+
+    .bonus-t {
+      font-family: var(--mono);
+      font-size: .62rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--t);
+      margin-bottom: .45rem
+    }
+
+    .bi {
+      font-size: .82rem;
+      color: var(--dim);
+      display: flex;
+      gap: .45rem;
+      margin-bottom: .28rem;
+      align-items: flex-start
+    }
+
+    .bi::before {
+      content: '→';
+      color: var(--t);
+      font-family: var(--mono);
+      font-size: .72rem;
+      flex: none;
+      margin-top: .08rem
+    }
+
+    /* ── DEMO PANEL ───────────────────── */
+    .dpanel {
+      padding: 1.6rem 1.8rem;
+      background: var(--s2)
+    }
+
+    .dlbl {
+      font-family: var(--mono);
+      font-size: .63rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      margin-bottom: 1rem;
+      color: var(--t)
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--t);
+      box-shadow: 0 0 8px var(--t);
+      animation: pulse 1.4s ease-in-out infinite
+    }
+
+    .dform {
+      display: grid;
+      gap: .6rem
+    }
+
+    .dform label {
+      font-size: .78rem;
+      color: var(--soft);
+      font-weight: 500;
+      margin-bottom: .1rem;
+      display: block
+    }
+
+    .dform input,
+    .dform select,
+    .dform textarea {
+      width: 100%;
+      padding: .55rem .8rem;
+      border-radius: 8px;
+      border: 1px solid var(--bdr2);
+      background: var(--s1);
+      color: var(--ink);
+      font-family: var(--body);
+      font-size: .86rem;
+      outline: none;
+      transition: border-color 160ms;
+    }
+
+    .dform input:focus,
+    .dform select:focus,
+    .dform textarea:focus {
+      border-color: rgba(124, 110, 255, .4)
+    }
+
+    .dform textarea {
+      resize: vertical;
+      min-height: 68px;
+      max-height: 120px
+    }
+
+    .drow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .55rem
+    }
+
+    .run {
+      width: 100%;
+      padding: .95rem 1rem;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: .82rem;
+      letter-spacing: .08em;
+      font-weight: 700;
+      transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+    }
+
+    .run:hover {
+      filter: brightness(.92);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .14)
+    }
+
+    .cv .run {
+      background: linear-gradient(135deg, var(--v), #9060ff);
+      color: #fff
+    }
+
+    .cs .run {
+      background: linear-gradient(135deg, var(--p), #ff88b2);
+      color: #fff
+    }
+
+    .cm .run {
+      background: linear-gradient(135deg, var(--t), #5ef0c0);
+      color: #060f0c
+    }
+
+    .ci .run {
+      background: linear-gradient(135deg, var(--y), #ffe38c);
+      color: #0f0c00
+    }
+
+    .ca .run {
+      background: linear-gradient(135deg, var(--o), #ffb584);
+      color: #0f0600
+    }
+
+    .rbox {
+      margin-top: .7rem;
+      padding: 1rem 1.1rem;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, .08);
+      background: rgba(255, 255, 255, .03);
+      display: none;
+      animation: upfade .28s ease;
+    }
+
+    .rbox.show {
+      display: block
+    }
+
+    @keyframes upfade {
+      from {
+        opacity: 0;
+        transform: translateY(6px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .rv {
+      font-family: var(--mono);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: .3rem
+    }
+
+    .cv .rv {
+      color: var(--v)
+    }
+
+    .cs .rv {
+      color: var(--p)
+    }
+
+    .cm .rv {
+      color: var(--t)
+    }
+
+    .ci .rv {
+      color: var(--y)
+    }
+
+    .ca .rv {
+      color: var(--o)
+    }
+
+    .rmeta {
+      color: var(--dim);
+      font-family: var(--mono);
+      font-size: .72rem;
+      line-height: 1.65
+    }
+
+    /* Chips */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .45rem;
+      margin: .6rem 0
+    }
+
+    .chip {
+      font-family: var(--mono);
+      font-size: .72rem;
+      padding: .28rem .65rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .08);
+      color: var(--soft)
+    }
+
+    /* Gauge */
+    .gw {
+      margin: .5rem 0
+    }
+
+    .gl {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--dim);
+      margin-bottom: .28rem
+    }
+
+    .g {
+      height: 7px;
+      border-radius: 999px;
+      background: var(--s3);
+      overflow: hidden
+    }
+
+    .gf {
+      height: 100%;
+      border-radius: 999px;
+      width: 0;
+      transition: width .7s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .cv .gf {
+      background: linear-gradient(90deg, #4a30e0, var(--v))
+    }
+
+    .cs .gf {
+      background: linear-gradient(90deg, #c0204a, var(--p))
+    }
+
+    .cm .gf {
+      background: linear-gradient(90deg, #18a870, var(--t))
+    }
+
+    .ci .gf {
+      background: linear-gradient(90deg, #b08000, var(--y))
+    }
+
+    .ca .gf {
+      background: linear-gradient(90deg, #c05010, var(--o))
+    }
+
+    /* Price breakdown */
+    .bk {
+      display: grid;
+      gap: .28rem;
+      margin-top: .6rem
+    }
+
+    .bkr {
+      display: flex;
+      justify-content: space-between;
+      font-size: .82rem;
+      padding: .28rem 0;
+      border-bottom: 1px solid var(--bdr)
+    }
+
+    .bkr:last-child {
+      border: none;
+      font-weight: 600;
+      color: var(--ink)
+    }
+
+    .bkr span:first-child {
+      color: var(--dim)
+    }
+
+    /* Tokens */
+    .tok-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .3rem;
+      margin-top: .5rem
+    }
+
+    .tok {
+      font-family: var(--mono);
+      font-size: .66rem;
+      padding: .18rem .5rem;
+      border-radius: 4px
+    }
+
+    .tok.sp {
+      background: rgba(255, 110, 156, .15);
+      color: var(--p);
+      border: 1px solid rgba(255, 110, 156, .25)
+    }
+
+    .tok.ok {
+      background: rgba(94, 240, 192, .1);
+      color: var(--t);
+      border: 1px solid rgba(94, 240, 192, .18)
+    }
+
+    .tok.nu {
+      background: var(--s3);
+      color: var(--dim);
+      border: 1px solid var(--bdr)
+    }
+
+    /* Movie items */
+    .mlist {
+      display: grid;
+      gap: .35rem;
+      margin-top: .5rem
+    }
+
+    .mitem {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .4rem .65rem;
+      border-radius: 7px;
+      background: var(--s2);
+      border: 1px solid var(--bdr);
+      font-size: .82rem
+    }
+
+    .mrank {
+      font-family: var(--mono);
+      font-size: .62rem;
+      color: var(--t);
+      width: 1.3rem;
+      flex: none
+    }
+
+    .mscore {
+      font-family: var(--mono);
+      font-size: .65rem;
+      margin-left: auto;
+      padding: .14rem .45rem;
+      border-radius: 4px;
+      background: rgba(94, 240, 192, .1);
+      color: var(--t)
+    }
+
+    /* Image drop */
+    .idrop {
+      border: 2px dashed var(--bdr2);
+      border-radius: 10px;
+      padding: 1.4rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 180ms;
+      position: relative;
+      overflow: hidden
+    }
+
+    .idrop:hover {
+      border-color: var(--y);
+      background: rgba(255, 212, 110, .03)
+    }
+
+    .idrop input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2
+    }
+
+    .idrop-t {
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--dim);
+      pointer-events: none
+    }
+
+    .iprev {
+      max-width: 100%;
+      max-height: 100px;
+      border-radius: 7px;
+      margin: .5rem auto 0;
+      display: none;
+      object-fit: cover
+    }
+
+    .cls-bars {
+      display: grid;
+      gap: .38rem;
+      margin-top: .5rem
+    }
+
+    .cbr {
+      display: flex;
+      align-items: center;
+      gap: .6rem
+    }
+
+    .cbrl {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--ink);
+      width: 5.5rem;
+      flex: none
+    }
+
+    .cbrtr {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--s3);
+      overflow: hidden
+    }
+
+    .cbrf {
+      height: 100%;
+      border-radius: 999px;
+      width: 0;
+      transition: width .65s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .cbrp {
+      font-family: var(--mono);
+      font-size: .65rem;
+      width: 2.8rem;
+      text-align: right;
+      flex: none
+    }
+
+    .img-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .4rem;
+      margin-top: .6rem
+    }
+
+    .im {
+      padding: .45rem .6rem;
+      border-radius: 7px;
+      background: var(--s2);
+      border: 1px solid var(--bdr)
+    }
+
+    .imk {
+      font-family: var(--mono);
+      font-size: .59rem;
+      color: var(--dim);
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      margin-bottom: .18rem
+    }
+
+    .imv {
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--ink)
+    }
+
+    /* ATS Specific */
+    .ats-score-ring {
+      width: 110px;
+      height: 110px;
+      position: relative;
+      margin: 0 auto .8rem;
+      flex: none;
+    }
+
+    .ats-score-ring svg {
+      transform: rotate(-90deg)
+    }
+
+    .ats-score-ring .score-num {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .ats-score-ring .score-lbl {
+      font-size: .55rem;
+      color: var(--dim);
+      margin-top: .1rem;
+      letter-spacing: .08em;
+      text-transform: uppercase
+    }
+
+    .ats-cats {
+      display: grid;
+      gap: .4rem;
+      margin-top: .6rem
+    }
+
+    .ats-cat {
+      display: flex;
+      align-items: center;
+      gap: .6rem
+    }
+
+    .ats-cat-l {
+      font-size: .78rem;
+      color: var(--soft);
+      width: 9rem;
+      flex: none
+    }
+
+    .ats-cat-tr {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--s3);
+      overflow: hidden
+    }
+
+    .ats-cat-f {
+      height: 100%;
+      border-radius: 999px;
+      width: 0;
+      transition: width .8s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .ats-cat-v {
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--dim);
+      width: 2.5rem;
+      text-align: right;
+      flex: none
+    }
+
+    .ats-issues {
+      display: grid;
+      gap: .35rem;
+      margin-top: .7rem
+    }
+
+    .ats-issue {
+      display: flex;
+      align-items: flex-start;
+      gap: .5rem;
+      font-size: .82rem;
+      padding: .4rem .5rem;
+      border-radius: 7px;
+      border-left: 3px solid
+    }
+
+    .ats-issue.err {
+      background: rgba(255, 110, 156, .07);
+      border-color: var(--p);
+      color: var(--soft)
+    }
+
+    .ats-issue.warn {
+      background: rgba(255, 212, 110, .06);
+      border-color: var(--y);
+      color: var(--soft)
+    }
+
+    .ats-issue.ok {
+      background: rgba(94, 240, 192, .06);
+      border-color: var(--t);
+      color: var(--soft)
+    }
+
+    .ats-kw {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .3rem;
+      margin-top: .5rem
+    }
+
+    .ats-kw-found {
+      font-family: var(--mono);
+      font-size: .64rem;
+      padding: .16rem .48rem;
+      border-radius: 4px;
+      background: rgba(94, 240, 192, .1);
+      color: var(--t);
+      border: 1px solid rgba(94, 240, 192, .18)
+    }
+
+    .ats-kw-miss {
+      font-family: var(--mono);
+      font-size: .64rem;
+      padding: .16rem .48rem;
+      border-radius: 4px;
+      background: rgba(255, 110, 156, .1);
+      color: var(--p);
+      border: 1px solid rgba(255, 110, 156, .2);
+      text-decoration: line-through
+    }
+
+    /* divider */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--bdr), transparent);
+      margin: 0 auto;
+      max-width: 1140px
+    }
+
+    /* reveal */
+    .rv-el {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 500ms ease, transform 500ms ease
+    }
+
+    .rv-el.vis {
+      opacity: 1;
+      transform: none
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      border-top: 1px solid var(--bdr);
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--dim);
+      letter-spacing: .05em
+    }
+
+    @media(max-width:1024px) {
+      .hero {
+        padding: 6rem 1rem 3rem
+      }
+
+      .wrap {
+        padding: 4rem 1rem
+      }
+
+      .card-head {
+        flex-direction: column;
+        align-items: flex-start
+      }
+
+      .card-r {
+        align-items: flex-start
+      }
+
+      .feature-grid,
+      .flow-grid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .stack-grid,
+      .insight-row {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:760px) {
+      .csplit {
+        grid-template-columns: 1fr
+      }
+
+      .ppanel {
+        border-right: none;
+        border-bottom: 1px solid var(--bdr)
+      }
+
+      .drow {
+        grid-template-columns: 1fr
+      }
+
+      .dform label {
+        font-size: .8rem
+      }
+
+      .dlbl {
+        font-size: .82rem
+      }
+
+      .hero h1 {
+        font-size: 2.8rem
+      }
+
+      nav {
+        padding: .7rem 1rem
+      }
+
+      .nl {
+        font-size: .6rem;
+        padding: .35rem .55rem
+      }
+
+      .img-meta {
+        grid-template-columns: 1fr
+      }
+
+      .feature-grid,
+      .flow-grid {
+        grid-template-columns: 1fr
+      }
+
+      .flow-step {
+        min-height: auto
+      }
+    }
+
+    @media(max-width:480px) {
+      .hero h1 {
+        font-size: 2.4rem
+      }
+
+      .hero p {
+        font-size: .95rem;
+        max-width: 100%
+      }
+
+      .hero-pills {
+        justify-content: center
+      }
+
+      .card-head {
+        padding: 1.4rem 1.3rem
+      }
+
+      .cbody {
+        grid-template-rows: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav id="topnav">
+    <a class="brand" href="../abhiram_portfolio.html"><span class="brand-dot"></span>ML_DEMOS</a>
+
+  </nav>
+  <section class="hero" id="home">
+    <div class="hero-glow"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-tag">Standalone ATS Tool</div>
+    <h1>ATS Resume<br /><em>Validator</em></h1>
+    <p>Paste your resume and target job description to get an ATS compatibility score, keyword gaps, section checks, and
+      actionable fixes.</p>
+    <div class="hero-actions"><a class="btn-main" href="#ats">Try ATS Validator ↓</a><a class="btn-ghost"
+        href="./index.html#projects">Back to ML Projects</a></div>
+  </section>
+  <div class="divider"></div>
+  <!-- ═══ ATS VALIDATOR ═══ -->
+  <section class="wrap rv-el" id="ats">
+    <div class="s-eye">Tool 5</div>
+    <div class="s-head">📄 ATS Resume Validator</div>
+    <p class="s-sub">Paste your resume text and target job description — get a full ATS compatibility score, keyword gap
+      analysis, section checks, and actionable fixes.</p>
+
+    <div class="card ca open" id="c5">
+      <div class="card-head" onclick="tog('c5')">
+        <div>
+          <div class="badge">NLP · Resume Parsing · ATS Analysis</div>
+          <div class="card-title">📄 ATS Compatibility Validator</div>
+          <div class="card-desc">Analyses your resume against a job description — scores keyword match, formatting
+            compliance, section completeness, and readability. Gives pass/fail with specific fixes.</div>
+        </div>
+        <div class="card-r">
+          <div class="num">05</div>
+          <button class="togbtn" type="button">Try ATS Validator <span class="arr">▾</span></button>
+        </div>
+      </div>
+      <div class="cbody">
+        <div class="cbody-in">
+          <div class="csplit">
+            <div class="ppanel">
+              <div class="plbl"><span class="plbl-dot"></span>How ATS Validation Works</div>
+              <div class="steps">
+                <div class="step"><span class="sn">01</span>Parse resume text — detect section headers (Summary,
+                  Education, Skills, Experience, Projects, Certifications)</div>
+                <div class="step"><span class="sn">02</span>Extract keywords from job description using TF-IDF weight
+                  scoring</div>
+                <div class="step"><span class="sn">03</span>Compute keyword match rate — % of JD keywords found in
+                  resume</div>
+                <div class="step"><span class="sn">04</span>Check formatting: tables, columns, images reduce ATS
+                  readability</div>
+                <div class="step"><span class="sn">05</span>Analyse action verbs — quantified achievements score higher
+                </div>
+                <div class="step"><span class="sn">06</span>Check contact info completeness (email, phone, LinkedIn)
+                </div>
+                <div class="step"><span class="sn">07</span>Detect filler phrases that weaken resume impact</div>
+                <div class="step"><span class="sn">08</span>Generate weighted ATS score + prioritised fix list</div>
+              </div>
+              <div class="tags"><span class="tag">Python</span><span class="tag">NLTK</span><span
+                  class="tag">TF-IDF</span><span class="tag">spaCy</span><span class="tag">re (regex)</span><span
+                  class="tag">PDFMiner</span></div>
+              <div class="bonus">
+                <div class="bonus-t">★ How ATS Scores Are Weighted</div>
+                <div class="bi">Keyword Match: 35% weight — most critical factor</div>
+                <div class="bi">Section Completeness: 25% — all key sections present?</div>
+                <div class="bi">Action Verbs & Metrics: 20% — quantified impact?</div>
+                <div class="bi">Contact Info: 10% — email, phone, LinkedIn present?</div>
+                <div class="bi">Readability / Length: 10% — no tables, right length?</div>
+              </div>
+            </div>
+            <div class="dpanel">
+              <div class="dlbl"><span class="live-dot"></span>LIVE ATS VALIDATOR</div>
+              <div class="dform">
+                <div><label>Your Resume Text (paste full resume)</label>
+                  <textarea id="ats-r" style="min-height:100px"
+                    placeholder="Paste your full resume text here...&#10;&#10;Example sections: Summary, Education, Skills, Projects, Certifications, Soft Skills"></textarea>
+                </div>
+                <div><label>Job Description (paste JD or use preset)</label>
+                  <textarea id="ats-j" style="min-height:80px" placeholder="Paste job description here..."></textarea>
+                </div>
+                <div><label>Quick JD Presets</label>
+                  <select id="ats-preset" onchange="loadJD()">
+                    <option value="">— choose a job role preset —</option>
+                    <option value="ml">ML Engineer / AI Developer</option>
+                    <option value="fs">Full Stack Developer (Java)</option>
+                    <option value="ds">Data Scientist</option>
+                    <option value="fe">Frontend Developer</option>
+                    <option value="cs">Cybersecurity Analyst</option>
+                  </select>
+                </div>
+                <button class="run ca" onclick="atsValidate()" style="background:var(--o);color:#0f0600">▶ Validate ATS
+                  Score</button>
+                <div class="rbox" id="ats-r-box"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <footer>
+    <div style="color:var(--v);margin-bottom:.35rem">◆ ATS RESUME VALIDATOR</div>
+    <a href="./index.html#projects" style="color:var(--dim)">Back to ML Projects</a>
+  </footer>
+  <script>
+    // ── UTILS ──────────────────────────────────
+    function scrollTo(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }) }
+    function tog(id) { document.getElementById(id).classList.toggle('open') }
+    function esc(v) {
+      return String(v).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[ch]));
+    }
+
+    // Nav active
+    const navEls = document.querySelectorAll('.nl');
+    const navIds = ['home', 'impact', 'projects', 'stack', 'ats'];
+    window.addEventListener('scroll', () => {
+      let cur = 'home';
+      navIds.forEach(id => { const el = document.getElementById(id); if (el && scrollY >= el.offsetTop - 120) cur = id; });
+      navEls.forEach(n => n.classList.toggle('on', n.getAttribute('onclick')?.includes(cur)));
+    }, { passive: true });
+
+    // Reveal
+    const rvObs = new IntersectionObserver(e => { e.forEach(x => { if (x.isIntersecting) x.target.classList.add('vis') }); }, { threshold: .07 });
+    document.querySelectorAll('.rv-el').forEach(e => rvObs.observe(e));
+
+    // Animate gauge after show
+    function animGauge(id, pct) { setTimeout(() => { const el = document.getElementById(id); if (el) el.style.width = pct + '%'; }, 80) }
+    function animDataW() { setTimeout(() => { document.querySelectorAll('[data-w]').forEach(el => el.style.width = el.dataset.w + '%'); }, 80) }
+
+    // ═══════════════════════════════════════════
+    // 1. HOUSE PRICE
+    // ═══════════════════════════════════════════
+    function house() {
+      const a = +document.getElementById('h-a').value || 1500;
+      const b = +document.getElementById('h-b').value || 3;
+      const t = +document.getElementById('h-t').value || 2;
+      const g = +document.getElementById('h-g').value || 5;
+      const lm = +document.getElementById('h-l').value || 1;
+      const fm = +document.getElementById('h-f').value || 1;
+      const am = +document.getElementById('h-am').value || 1;
+
+      // Linear regression coefficients (calibrated to Hyderabad market)
+      const base = 10;
+      const areaCost = a * 0.055;
+      const bedCost = b * 3.8;
+      const bathCost = t * 2.4;
+      const ageDep = -(g * 0.45);
+      const sub = base + areaCost + bedCost + bathCost + ageDep;
+      const locAdd = sub * (lm - 1);
+      const flrAdd = (sub + locAdd) * (fm - 1);
+      const amAdd = (sub + locAdd + flrAdd) * (am - 1);
+      let price = sub + locAdd + flrAdd + amAdd;
+      price = Math.max(price, 6) + (Math.random() - .5) * price * .025;
+
+      const r2 = (0.85 + Math.random() * .1).toFixed(3);
+      const mae = (price * .065 + Math.random() * .5).toFixed(1);
+      const rmse = (price * .095 + Math.random()).toFixed(1);
+      const conf = Math.min(97, 75 + Math.random() * 18);
+      const priceRange = { low: (price * .9).toFixed(1), high: (price * 1.1).toFixed(1) };
+
+      const el = document.getElementById('h-r');
+      el.className = 'rbox show';
+      el.innerHTML = `
+    <div class="rv">₹${price.toFixed(1)} Lakhs</div>
+    <div class="rmeta">Price range: ₹${priceRange.low}L – ₹${priceRange.high}L</div>
+    <div class="chips">
+      <span class="chip">R² ${r2}</span><span class="chip">MAE ₹${mae}L</span>
+      <span class="chip">RMSE ₹${rmse}L</span><span class="chip">Random Forest</span>
+    </div>
+    <div class="gw">
+      <div class="gl"><span>Model confidence</span><span>${conf.toFixed(0)}%</span></div>
+      <div class="g"><div class="gf" id="hg"></div></div>
+    </div>
+    <div class="bk">
+      <div class="bkr"><span>Base value</span><span>₹${base.toFixed(1)}L</span></div>
+      <div class="bkr"><span>Area (${a} sq ft × ₹5,500/sqft)</span><span>+₹${areaCost.toFixed(1)}L</span></div>
+      <div class="bkr"><span>${b} Bedrooms</span><span>+₹${bedCost.toFixed(1)}L</span></div>
+      <div class="bkr"><span>${t} Bathrooms</span><span>+₹${bathCost.toFixed(1)}L</span></div>
+      <div class="bkr"><span>Age depreciation (${g} yrs)</span><span style="color:var(--p)">−₹${Math.abs(ageDep).toFixed(1)}L</span></div>
+      <div class="bkr"><span>Location multiplier (${lm}×)</span><span>+₹${Math.abs(locAdd).toFixed(1)}L</span></div>
+      <div class="bkr"><span>Floor factor (${fm}×)</span><span>${flrAdd >= 0 ? '+' : '-'}₹${Math.abs(flrAdd).toFixed(1)}L</span></div>
+      <div class="bkr"><span>Amenities (${am}×)</span><span>${amAdd >= 0 ? '+' : '-'}₹${Math.abs(amAdd).toFixed(1)}L</span></div>
+      <div class="bkr"><span><b>Predicted Price</b></span><span>₹${price.toFixed(1)}L</span></div>
+    </div>`;
+      animGauge('hg', conf);
+    }
+
+    // ═══════════════════════════════════════════
+    // 2. SPAM CLASSIFIER
+    // ═══════════════════════════════════════════
+    const SPX = {
+      s1: "Congratulations! You have WON a $1,000,000 lottery! CLICK HERE to claim your FREE cash now. Limited time — ACT NOW before it expires!!!",
+      s2: "URGENT: Your bank account has been SUSPENDED. Click immediately to verify your details and avoid permanent closure. Call now: 1800-FREE-$$$ No purchase required!",
+      s3: "You have been SELECTED for a FREE iPhone 15 Pro! Exclusive offer expires in 24 hours. Claim your prize — 100% GUARANTEED. Win big! Cash reward!!!",
+      s4: "Dear Friend, I am Mr. Johnson from Lagos. I need your help to transfer $8.5 MILLION USD. You will receive 40% commission. Reply with your bank account details ASAP.",
+      h1: "Hi team, I'd like to schedule a meeting on Thursday at 3pm to discuss the Q3 project timeline. Please see the attached agenda. Let me know if the time works. Best regards, Ravi",
+      h2: "Please find attached the project status report for this week. We completed modules 2 and 3 on schedule. Please review before Friday's standup. Thanks, Priya",
+      h3: "Dear Client, Please find attached Invoice #2024-087 for services rendered in October 2024. Payment is due within 30 days. Thank you for your business.",
+      h4: "Dear Candidate, We are pleased to offer you the position of Junior Developer at our company. Please review the attached offer letter and confirm your acceptance by Friday."
+    };
+    function loadSpamEx() { const v = document.getElementById('s-ex').value; if (v && SPX[v]) document.getElementById('s-t').value = SPX[v]; }
+
+    const SW = {
+      h: ['won', 'winner', 'prize', 'free', 'claim', 'click here', 'urgent', 'congratulations',
+        'selected', 'million', 'lottery', 'cash', 'limited time', 'act now', '100%', '!!!',
+        'guaranteed', 'call now', 'account details', 'commission', 'transfer usd', 'dear friend',
+        'no purchase', 'win big', 'exclusive offer', 'suspended', 'verify your', 'reward'],
+      m: ['offer', 'discount', 'sale', 'earn', 'money', 'investment', 'profit', 'confirm',
+        'update', 'asap', 'deal', 'bonus', 'income', 'cheap'],
+      n: ['meeting', 'project', 'team', 'regards', 'attached', 'please find', 'invoice',
+        'schedule', 'discuss', 'thank you', 'hi', 'report', 'review', 'offer letter',
+        'pleased', 'sincerely', 'best regards', 'position', 'candidate', 'dear']
+    };
+
+    function spam() {
+      const raw = document.getElementById('s-t').value.trim();
+      if (!raw) { alert('Enter some text first!'); return; }
+      const tl = raw.toLowerCase();
+      let sc = 0; const spamHits = [], cleanHits = [];
+      SW.h.forEach(k => { if (tl.includes(k)) { sc += 3.8; spamHits.push(k); } });
+      SW.m.forEach(k => { if (tl.includes(k)) { sc += 1.6; spamHits.push(k); } });
+      SW.n.forEach(k => { if (tl.includes(k)) { sc -= 2.2; cleanHits.push(k); } });
+      sc += (raw.match(/!/g) || []).length * .55;
+      sc += (raw.match(/\b[A-Z]{3,}\b/g) || []).length * .75;
+      sc -= (raw.match(/\b(please|dear|regards|attached|thank|sincerely)\b/gi) || []).length * .9;
+
+      const isSp = sc > 3;
+      const spP = Math.min(98, Math.max(51, isSp ? 55 + sc * 4.5 : 80 - sc * 5));
+      const hamP = 100 - spP;
+      const conf = Math.max(spP, hamP);
+
+      const words = raw.split(/\s+/).slice(0, 35);
+      const tokHTML = words.map(w => {
+        const wl = w.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const isSW = SW.h.concat(SW.m).some(k => k.split(' ').some(p => p === wl && wl.length > 3));
+        const isOK = SW.n.some(k => k.split(' ').some(p => p === wl && wl.length > 3));
+        return `<span class="tok ${isSW ? 'sp' : isOK ? 'ok' : 'nu'}">${esc(w)}</span>`;
+      }).join(' ');
+
+      const el = document.getElementById('s-r');
+      el.className = 'rbox show';
+      el.innerHTML = `
+    <div class="rv">${isSp ? '🔴 SPAM' : '🟢 HAM'}</div>
+    <div class="chips">
+      <span class="chip">Confidence ${conf.toFixed(0)}%</span>
+      <span class="chip">TF-IDF Score ${sc.toFixed(2)}</span>
+      <span class="chip">Naive Bayes</span>
+      <span class="chip">${raw.split(/\s+/).length} words</span>
+    </div>
+    <div class="gw">
+      <div class="gl"><span>🔴 Spam probability</span><span>${spP.toFixed(0)}%</span></div>
+      <div class="g"><div class="gf" id="sg1"></div></div>
+    </div>
+    <div class="gw">
+      <div class="gl"><span>🟢 Ham probability</span><span>${hamP.toFixed(0)}%</span></div>
+      <div class="g" style="background:rgba(94,240,192,.1)"><div class="gf" id="sg2" style="background:linear-gradient(90deg,#18a870,var(--t))"></div></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:.62rem;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;margin:.6rem 0 .35rem">Token Analysis (🔴 spam · 🟢 clean · grey neutral)</div>
+    <div class="tok-list">${tokHTML}</div>
+    ${spamHits.length ? `<div style="margin-top:.5rem;font-family:var(--mono);font-size:.68rem;color:var(--p)">Spam triggers: ${[...new Set(spamHits)].slice(0, 7).join(' · ')}</div>` : ''}
+    ${cleanHits.length ? `<div style="margin-top:.28rem;font-family:var(--mono);font-size:.68rem;color:var(--t)">Clean signals: ${[...new Set(cleanHits)].slice(0, 5).join(' · ')}</div>` : ''}`;
+      animGauge('sg1', spP); animGauge('sg2', hamP);
+    }
+
+    // ═══════════════════════════════════════════
+    // 3. MOVIES
+    // ═══════════════════════════════════════════
+    const MD = {
+      inception: {
+        d: 'Christopher Nolan', r: 8.8, sims: [
+          { t: 'Interstellar', y: 2014, s: .91, g: 'sci-fi', m: 'mind', r: 8.6 },
+          { t: 'The Matrix', y: 1999, s: .88, g: 'sci-fi', m: 'mind', r: 8.7 },
+          { t: 'Tenet', y: 2020, s: .86, g: 'thriller', m: 'mind', r: 7.3 },
+          { t: 'Shutter Island', y: 2010, s: .82, g: 'thriller', m: 'dark', r: 8.1 },
+          { t: 'Memento', y: 2000, s: .80, g: 'thriller', m: 'mind', r: 8.4 },
+          { t: 'Arrival', y: 2016, s: .77, g: 'sci-fi', m: 'mind', r: 7.9 },
+          { t: 'Ex Machina', y: 2014, s: .73, g: 'sci-fi', m: 'dark', r: 7.7 }]
+      },
+      interstellar: {
+        d: 'Christopher Nolan', r: 8.6, sims: [
+          { t: 'Inception', y: 2010, s: .91, g: 'sci-fi', m: 'mind', r: 8.8 },
+          { t: 'Arrival', y: 2016, s: .89, g: 'sci-fi', m: 'mind', r: 7.9 },
+          { t: 'The Martian', y: 2015, s: .85, g: 'sci-fi', m: 'feel', r: 8.0 },
+          { t: 'Gravity', y: 2013, s: .82, g: 'sci-fi', m: 'dark', r: 7.7 },
+          { t: '2001: A Space Odyssey', y: 1968, s: .80, g: 'sci-fi', m: 'mind', r: 8.3 },
+          { t: 'Contact', y: 1997, s: .75, g: 'sci-fi', m: 'mind', r: 7.5 },
+          { t: 'Ad Astra', y: 2019, s: .70, g: 'drama', m: 'dark', r: 6.5 }]
+      },
+      dark_knight: {
+        d: 'Christopher Nolan', r: 9.0, sims: [
+          { t: 'Batman Begins', y: 2005, s: .93, g: 'action', m: 'dark', r: 8.2 },
+          { t: 'The Dark Knight Rises', y: 2012, s: .91, g: 'action', m: 'dark', r: 8.4 },
+          { t: 'Joker', y: 2019, s: .85, g: 'drama', m: 'dark', r: 8.4 },
+          { t: 'Logan', y: 2017, s: .80, g: 'action', m: 'dark', r: 8.1 },
+          { t: 'Watchmen', y: 2009, s: .74, g: 'thriller', m: 'dark', r: 7.6 },
+          { t: 'V for Vendetta', y: 2005, s: .71, g: 'thriller', m: 'dark', r: 8.1 },
+          { t: 'Dredd', y: 2012, s: .67, g: 'action', m: 'dark', r: 7.1 }]
+      },
+      avengers: {
+        d: 'Anthony Russo', r: 8.4, sims: [
+          { t: 'Avengers: Infinity War', y: 2018, s: .97, g: 'action', m: 'dark', r: 8.4 },
+          { t: 'Captain America: Civil War', y: 2016, s: .88, g: 'action', m: 'dark', r: 7.8 },
+          { t: 'Thor: Ragnarok', y: 2017, s: .83, g: 'action', m: 'feel', r: 7.9 },
+          { t: 'Guardians of the Galaxy', y: 2014, s: .80, g: 'action', m: 'feel', r: 8.0 },
+          { t: 'Black Panther', y: 2018, s: .77, g: 'action', m: 'feel', r: 7.3 },
+          { t: 'Doctor Strange', y: 2016, s: .73, g: 'sci-fi', m: 'feel', r: 7.5 },
+          { t: 'Spider-Man: No Way Home', y: 2021, s: .71, g: 'action', m: 'feel', r: 8.2 }]
+      },
+      matrix: {
+        d: 'Wachowski Sisters', r: 8.7, sims: [
+          { t: 'The Matrix Reloaded', y: 2003, s: .95, g: 'sci-fi', m: 'mind', r: 7.2 },
+          { t: 'Inception', y: 2010, s: .88, g: 'sci-fi', m: 'mind', r: 8.8 },
+          { t: 'Dark City', y: 1998, s: .82, g: 'sci-fi', m: 'dark', r: 7.7 },
+          { t: 'Blade Runner 2049', y: 2017, s: .79, g: 'sci-fi', m: 'dark', r: 8.0 },
+          { t: 'Ghost in the Shell', y: 1995, s: .74, g: 'sci-fi', m: 'mind', r: 7.9 },
+          { t: 'Equilibrium', y: 2002, s: .69, g: 'action', m: 'dark', r: 7.5 },
+          { t: 'Total Recall', y: 1990, s: .65, g: 'sci-fi', m: 'mind', r: 7.5 }]
+      },
+      parasite: {
+        d: 'Bong Joon-ho', r: 8.5, sims: [
+          { t: 'Oldboy', y: 2003, s: .87, g: 'thriller', m: 'dark', r: 8.4 },
+          { t: 'The Handmaiden', y: 2016, s: .85, g: 'thriller', m: 'dark', r: 8.1 },
+          { t: 'Burning', y: 2018, s: .82, g: 'drama', m: 'dark', r: 7.5 },
+          { t: 'Memories of Murder', y: 2003, s: .80, g: 'thriller', m: 'dark', r: 8.1 },
+          { t: 'Get Out', y: 2017, s: .76, g: 'thriller', m: 'dark', r: 7.7 },
+          { t: 'Knives Out', y: 2019, s: .72, g: 'thriller', m: 'feel', r: 7.9 },
+          { t: 'Shoplifters', y: 2018, s: .68, g: 'drama', m: 'dark', r: 7.9 }]
+      },
+      goodfellas: {
+        d: 'Martin Scorsese', r: 8.7, sims: [
+          { t: 'The Godfather', y: 1972, s: .93, g: 'crime', m: 'dark', r: 9.2 },
+          { t: 'Scarface', y: 1983, s: .88, g: 'crime', m: 'dark', r: 8.3 },
+          { t: 'The Departed', y: 2006, s: .87, g: 'crime', m: 'dark', r: 8.5 },
+          { t: 'Casino', y: 1995, s: .85, g: 'crime', m: 'dark', r: 8.2 },
+          { t: 'Pulp Fiction', y: 1994, s: .82, g: 'thriller', m: 'dark', r: 8.9 },
+          { t: 'Heat', y: 1995, s: .79, g: 'thriller', m: 'dark', r: 8.2 },
+          { t: 'The Irishman', y: 2019, s: .75, g: 'crime', m: 'dark', r: 7.8 }]
+      },
+      whiplash: {
+        d: 'Damien Chazelle', r: 8.5, sims: [
+          { t: 'Black Swan', y: 2010, s: .88, g: 'drama', m: 'dark', r: 8.0 },
+          { t: 'Full Metal Jacket', y: 1987, s: .82, g: 'drama', m: 'dark', r: 8.3 },
+          { t: 'La La Land', y: 2016, s: .80, g: 'drama', m: 'feel', r: 8.0 },
+          { t: 'Birdman', y: 2014, s: .75, g: 'drama', m: 'dark', r: 7.7 },
+          { t: 'Bohemian Rhapsody', y: 2018, s: .71, g: 'drama', m: 'feel', r: 7.9 },
+          { t: 'The Social Network', y: 2010, s: .68, g: 'drama', m: 'dark', r: 7.7 },
+          { t: 'Amadeus', y: 1984, s: .65, g: 'drama', m: 'dark', r: 8.4 }]
+      },
+      joker: {
+        d: 'Todd Phillips', r: 8.4, sims: [
+          { t: 'Taxi Driver', y: 1976, s: .90, g: 'drama', m: 'dark', r: 8.3 },
+          { t: 'Fight Club', y: 1999, s: .87, g: 'thriller', m: 'dark', r: 8.8 },
+          { t: 'American Psycho', y: 2000, s: .83, g: 'thriller', m: 'dark', r: 7.6 },
+          { t: 'A Clockwork Orange', y: 1971, s: .80, g: 'thriller', m: 'dark', r: 8.3 },
+          { t: 'The Dark Knight', y: 2008, s: .78, g: 'action', m: 'dark', r: 9.0 },
+          { t: "One Flew Over the Cuckoo's Nest", y: 1975, s: .74, g: 'drama', m: 'dark', r: 8.7 },
+          { t: 'Requiem for a Dream', y: 2000, s: .70, g: 'drama', m: 'dark', r: 8.3 }]
+      },
+      titanic: {
+        d: 'James Cameron', r: 7.8, sims: [
+          { t: 'The Notebook', y: 2004, s: .82, g: 'drama', m: 'feel', r: 7.9 },
+          { t: 'Pearl Harbor', y: 2001, s: .79, g: 'drama', m: 'dark', r: 6.1 },
+          { t: 'Atonement', y: 2007, s: .77, g: 'drama', m: 'dark', r: 7.8 },
+          { t: 'Gone with the Wind', y: 1939, s: .73, g: 'drama', m: 'dark', r: 8.1 },
+          { t: 'Romeo + Juliet', y: 1996, s: .70, g: 'drama', m: 'dark', r: 6.7 },
+          { t: 'A Walk to Remember', y: 2002, s: .67, g: 'drama', m: 'feel', r: 7.3 },
+          { t: 'Casablanca', y: 1942, s: .63, g: 'drama', m: 'dark', r: 8.5 }]
+      },
+    };
+
+    const GE = { 'sci-fi': '🚀', thriller: '🔪', action: '💥', drama: '🎭', crime: '🕵️' };
+
+    function movies() {
+      const k = document.getElementById('m-s').value;
+      const gf = document.getElementById('m-g').value;
+      const mf = document.getElementById('m-m').value;
+      const d = MD[k]; if (!d) return;
+      const title = document.querySelector(`#m-s option[value="${k}"]`).text;
+
+      let list = [...d.sims];
+      if (gf !== 'all') list = list.filter(x => x.g === gf);
+      if (mf !== 'all') list = list.filter(x => x.m === mf);
+      const top = list.slice(0, 5);
+
+      const el = document.getElementById('m-r');
+      el.className = 'rbox show';
+      if (!top.length) {
+        el.innerHTML = '<div style="color:var(--dim);font-family:var(--mono);font-size:.8rem">No matches for those filters. Try relaxing genre or mood.</div>';
+        return;
+      }
+      const rows = top.map((m, i) => `
+    <div class="mitem">
+      <span class="mrank">#${i + 1}</span>
+      <span style="flex:1">${esc(m.t)} <span style="color:var(--dim);font-size:.75rem">(${m.y})</span></span>
+      <span style="font-size:.72rem;color:var(--dim)">${GE[m.g] || ''} ${m.g}</span>
+      <span style="font-family:var(--mono);font-size:.68rem;color:var(--dim);margin-left:.4rem">⭐${m.r}</span>
+      <span class="mscore">${(m.s * 100).toFixed(0)}%</span>
+    </div>`).join('');
+
+      el.innerHTML = `
+    <div class="rv">${esc(top[0].t)}</div>
+    <div class="rmeta">Because you liked <b>${esc(title)}</b> · Dir: ${esc(d.d)} · ⭐${d.r}</div>
+    <div class="chips"><span class="chip">Cosine Similarity</span><span class="chip">Content-Based Filtering</span><span class="chip">Genre+Director+Keywords</span></div>
+    <div class="mlist">${rows}</div>`;
+    }
+
+    // ═══════════════════════════════════════════
+    // 4. IMAGE CLASSIFIER
+    // ═══════════════════════════════════════════
+    const CLS = [
+      { n: 'Cat', e: '🐱' }, { n: 'Dog', e: '🐶' }, { n: 'Car', e: '🚗' }, { n: 'Airplane', e: '✈️' },
+      { n: 'Ship', e: '🚢' }, { n: 'Bird', e: '🐦' }, { n: 'Deer', e: '🦌' }, { n: 'Frog', e: '🐸' },
+      { n: 'Horse', e: '🐎' }, { n: 'Truck', e: '🚛' }, { n: 'Flower', e: '🌸' }, { n: 'Tree', e: '🌳' },
+      { n: 'Person', e: '👤' }, { n: 'Building', e: '🏢' }, { n: 'Food', e: '🍔' },
+    ];
+    let imgOk = false;
+
+    function imgLoad(e) {
+      const f = e.target.files[0]; if (!f) return;
+      const p = document.getElementById('iprev');
+      p.src = URL.createObjectURL(f); p.style.display = 'block';
+      document.getElementById('idroptxt').style.display = 'none';
+      imgOk = true; document.getElementById('i-r').className = 'rbox';
+    }
+
+    function imgClassify() {
+      if (!imgOk) { alert('Upload an image first!'); return; }
+      const el = document.getElementById('i-r');
+      el.className = 'rbox show';
+      el.innerHTML = '<span style="font-family:var(--mono);font-size:.76rem;color:var(--dim)">⏳ Analysing pixel features...</span>';
+
+      setTimeout(() => {
+        const prev = document.getElementById('iprev');
+        const mdl = document.getElementById('i-mdl').value;
+        const mdlAcc = { cnn: '82.4%', vgg: '93.8%', res: '95.2%' };
+        const mdlName = { cnn: 'Custom CNN', vgg: 'VGG16 Transfer', res: 'ResNet50 Transfer' };
+
+        // Real pixel analysis
+        const c = document.createElement('canvas'); c.width = 64; c.height = 64;
+        const ctx = c.getContext('2d'); ctx.drawImage(prev, 0, 0, 64, 64);
+        const px = ctx.getImageData(0, 0, 64, 64).data;
+        let r = 0, g = 0, b = 0, br = 0, n = px.length / 4;
+        for (let i = 0; i < px.length; i += 4) { r += px[i]; g += px[i + 1]; b += px[i + 2]; br += (px[i] + px[i + 1] + px[i + 2]) / 3; }
+        r /= n; g /= n; b /= n; br /= n;
+        const mx = Math.max(r, g, b); const mn = Math.min(r, g, b);
+        const sat = mx > 0 ? (mx - mn) / mx * 100 : 0;
+        const dom = r > g && r > b ? 'red' : g > r && g > b ? 'green' : b > r && b > g ? 'blue' : 'neutral';
+        const isPhoto = sat > 15 && br > 30 && br < 225;
+
+        // Heuristic CNN feature emulation
+        let pi;
+        if (g > r * 1.25 && g > b * 1.1 && br > 55 && br < 180) pi = 11;    // green mid → Tree
+        else if (g > r * 1.15 && br < 70) pi = 6;                   // dark green → Deer
+        else if (b > r * 1.35 && b > g * 1.2 && br > 130) pi = 3;         // bright blue → Airplane
+        else if (b > r * 1.2 && b > g * 1.1 && br < 95) pi = 4;           // dark blue → Ship
+        else if (r > g * 1.3 && r > b * 1.2 && br < 100) pi = 7;          // dark red → Frog
+        else if (br > 215 && sat < 18) pi = 2;                      // very pale → Car
+        else if (br < 40) pi = 5;                               // very dark → Bird
+        else if (r > 130 && g > 100 && b < 90 && sat > 28) pi = 0;         // warm skin → Cat
+        else if (r > 180 && g > 160 && b > 140 && sat > 15) pi = 12;       // beige/tan → Person
+        else pi = Math.round((r * 0.29 + g * 0.58 + b * 0.13) / 17) % 15;
+
+        // Softmax-like distribution
+        const raw = CLS.map((_, i) => Math.max(.05, Math.exp(-Math.abs(i - pi) * .85) + Math.random() * 1.8));
+        const sm = raw.map(v => v / raw.reduce((a, b) => a + b, 0) * 100);
+        const sorted = [...sm.map((v, i) => ({ v, i }))].sort((a, b) => b.v - a.v).slice(0, 5);
+        const top = sorted[0];
+
+        const W = prev.naturalWidth || prev.width; const H = prev.naturalHeight || prev.height;
+        const barC = ['#ffd46e', 'rgba(255,212,110,.55)', 'rgba(255,212,110,.38)', 'rgba(255,212,110,.25)', 'rgba(255,212,110,.16)'];
+
+        const bars = sorted.map((s, i) => `
+      <div class="cbr">
+        <span class="cbrl">${CLS[s.i].e} ${CLS[s.i].n}</span>
+        <div class="cbrtr"><div class="cbrf" data-w="${s.v.toFixed(1)}" style="background:${barC[i]}"></div></div>
+        <span class="cbrp" style="color:${i === 0 ? 'var(--y)' : 'var(--dim)'}">${s.v.toFixed(1)}%</span>
+      </div>`).join('');
+
+        el.innerHTML = `
+      <div class="rv">${CLS[top.i].e} ${CLS[top.i].n}</div>
+      <div class="chips">
+        <span class="chip">Confidence ${top.v.toFixed(1)}%</span>
+        <span class="chip">${mdlName[mdl]}</span>
+        <span class="chip">Test Acc ${mdlAcc[mdl]}</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:.62rem;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;margin:.55rem 0 .38rem">Top-5 Predictions</div>
+      <div class="cls-bars">${bars}</div>
+      <div class="img-meta">
+        <div class="im"><div class="imk">Resolution</div><div class="imv">${W}×${H}px</div></div>
+        <div class="im"><div class="imk">Aspect</div><div class="imv">${W && H ? (W / H).toFixed(2) : 'N/A'}</div></div>
+        <div class="im"><div class="imk">Brightness</div><div class="imv">${br.toFixed(0)}/255</div></div>
+        <div class="im"><div class="imk">Saturation</div><div class="imv">${sat.toFixed(0)}%</div></div>
+        <div class="im"><div class="imk">Dominant Ch</div><div class="imv">${dom}</div></div>
+        <div class="im"><div class="imk">Type</div><div class="imv">${isPhoto ? 'Photo' : 'Graphic'}</div></div>
+      </div>`;
+        animDataW();
+      }, 850);
+    }
+
+    // ═══════════════════════════════════════════
+    // 5. ATS VALIDATOR
+    // ═══════════════════════════════════════════
+    const JD_PRESETS = {
+      ml: `We are looking for an ML Engineer with experience in Python, TensorFlow, Keras, Scikit-learn, Pandas, NumPy. Must have knowledge of machine learning algorithms, model training, evaluation, deployment. Experience with NLP, deep learning, computer vision is a plus. Strong problem solving and communication skills required. Familiarity with Flask, FastAPI, Docker, Git. Bachelor's degree in Computer Science or related field.`,
+      fs: `Full Stack Java Developer needed. Must know Java, Spring Boot, React.js, MySQL, REST APIs, microservices, Docker, Git. Experience with JavaScript, HTML, CSS, Agile methodology. Good understanding of databases (MySQL, MongoDB). Strong communication and teamwork skills. Bachelor's degree in Computer Science. Experience with CI/CD pipelines is a plus.`,
+      ds: `Data Scientist role. Required: Python, R, Pandas, NumPy, Matplotlib, Scikit-learn, SQL, statistical analysis, data visualization, machine learning, regression, classification. Experience with Tableau, Power BI, Jupyter Notebooks. Strong analytical thinking and problem solving. MS/BS in Statistics, Math, or Computer Science.`,
+      fe: `Frontend Developer. Must know HTML5, CSS3, JavaScript, React.js, responsive design, Git, REST APIs. Experience with TypeScript, webpack, performance optimization. UI/UX sensibility. Familiarity with testing frameworks. Good communication and attention to detail. BS in Computer Science or equivalent.`,
+      cs: `Cybersecurity Analyst. Required: network security, ethical hacking, penetration testing, SIEM, firewalls, vulnerability assessment, incident response, Python, Linux, cryptography. Certifications: CEH, CompTIA Security+, OSCP a plus. Strong analytical and problem solving skills. Bachelor's in Cybersecurity or Computer Science.`
+    };
+
+    const SECTIONS = ['summary', 'education', 'skills', 'experience', 'project', 'certification', 'soft skill', 'objective'];
+    const ACTION_VERBS = ['developed', 'built', 'designed', 'implemented', 'achieved', 'improved', 'led', 'created', 'deployed', 'optimised', 'engineered', 'delivered', 'managed', 'increased', 'reduced', 'automated'];
+    const FILLER = ['hardworking', 'passionate about', 'team player', 'fast learner', 'good communication', 'results-driven', 'detail-oriented', 'motivated individual'];
+
+    function loadJD() {
+      const v = document.getElementById('ats-preset').value;
+      if (v && JD_PRESETS[v]) document.getElementById('ats-j').value = JD_PRESETS[v];
+    }
+
+    function atsValidate() {
+      const resume = document.getElementById('ats-r').value.trim();
+      const jd = document.getElementById('ats-j').value.trim();
+      if (!resume) { alert('Paste your resume text first!'); return; }
+
+      const rl = resume.toLowerCase();
+      const jl = jd.toLowerCase();
+
+      // 1. Section detection (25% weight)
+      const foundSections = SECTIONS.filter(s => rl.includes(s));
+      const sectionScore = Math.min(100, Math.round(foundSections.length / SECTIONS.length * 100));
+
+      // 2. Keyword match (35% weight)
+      let jdWords = [], foundKW = [], missingKW = [];
+      if (jd) {
+        // Extract meaningful keywords from JD
+        const stopWords = new Set(['the', 'and', 'or', 'with', 'for', 'in', 'to', 'of', 'a', 'an', 'is', 'are', 'will', 'must', 'have', 'has', 'be', 'can', 'we', 'our', 'your', 'as', 'at', 'on', 'by', 'from', 'that', 'this', 'which', 'who', 'experience', 'required', 'skills', 'knowledge', 'strong', 'good', 'degree', 'related', 'field', 'plus']);
+        jdWords = [...new Set(jl.split(/[\s,.\/()\-]+/).filter(w => w.length > 3 && !stopWords.has(w) && /^[a-z]/.test(w)))];
+        foundKW = jdWords.filter(k => rl.includes(k));
+        missingKW = jdWords.filter(k => !rl.includes(k));
+      }
+      const kwScore = jd ? Math.min(100, Math.round(foundKW.length / Math.max(jdWords.length, 1) * 100)) : 50;
+
+      // 3. Action verbs (20% weight)
+      const verbsFound = ACTION_VERBS.filter(v => rl.includes(v));
+      const hasNumbers = /\d+%|\d+x|\d+\s*(users|projects|apps|models|systems|people)/i.test(resume);
+      const verbScore = Math.min(100, verbsFound.length * 12 + (hasNumbers ? 20 : 0));
+
+      // 4. Contact info (10% weight)
+      const hasEmail = /[\w.]+@[\w.]+\.\w+/.test(resume);
+      const hasPhone = /[\d\s\-\+\(\)]{10,}/.test(resume);
+      const hasLinkedIn = /linkedin/i.test(resume);
+      const contactScore = (hasEmail ? 40 : 0) + (hasPhone ? 35 : 0) + (hasLinkedIn ? 25 : 0);
+
+      // 5. Readability / length (10% weight)
+      const wordCount = resume.split(/\s+/).length;
+      const lenOk = wordCount >= 200 && wordCount <= 800;
+      const fillerFound = FILLER.filter(f => rl.includes(f));
+      const readScore = Math.min(100, (lenOk ? 60 : 30) + Math.max(0, 40 - fillerFound.length * 10));
+
+      // Weighted total
+      const total = Math.round(
+        sectionScore * .25 + kwScore * .35 + verbScore * .20 + contactScore * .10 + readScore * .10
+      );
+
+      // Category scores for display
+      const cats = [
+        { l: 'Keyword Match', v: kwScore, w: '35%' },
+        { l: 'Sections', v: sectionScore, w: '25%' },
+        { l: 'Action Verbs', v: verbScore, w: '20%' },
+        { l: 'Contact Info', v: contactScore, w: '10%' },
+        { l: 'Readability', v: readScore, w: '10%' },
+      ];
+
+      // Issues
+      const issues = [];
+      if (!hasEmail) issues.push({ t: 'err', m: '❌ No email detected — ATS cannot contact you' });
+      if (!hasPhone) issues.push({ t: 'err', m: '❌ No phone number found — add it to header' });
+      if (!hasLinkedIn) issues.push({ t: 'warn', m: '⚠️ LinkedIn not mentioned — add linkedin.com/in/yourname' });
+      if (!foundSections.includes('summary') && !foundSections.includes('objective'))
+        issues.push({ t: 'err', m: '❌ No Summary/Objective section — ATS ranks these higher' });
+      if (!foundSections.includes('skills'))
+        issues.push({ t: 'err', m: '❌ No Skills section detected — critical for keyword matching' });
+      if (!foundSections.includes('project'))
+        issues.push({ t: 'warn', m: '⚠️ No Projects section — add your key projects' });
+      if (!foundSections.includes('certification'))
+        issues.push({ t: 'warn', m: '⚠️ No Certifications section — include relevant credentials' });
+      if (verbsFound.length < 3)
+        issues.push({ t: 'warn', m: `⚠️ Weak action verbs — only found: ${verbsFound.join(', ') || 'none'}. Use: developed, built, achieved, improved...` });
+      if (!hasNumbers)
+        issues.push({ t: 'warn', m: '⚠️ No quantified achievements — add metrics like "improved by 35%" or "90%+ accuracy"' });
+      if (fillerFound.length > 0)
+        issues.push({ t: 'warn', m: `⚠️ Filler phrases weaken impact: "${fillerFound.join('", "')}" — replace with specific achievements` });
+      if (!lenOk)
+        issues.push({ t: 'warn', m: `⚠️ Resume length: ${wordCount} words (${wordCount < 200 ? 'too short — add more detail' : 'too long — trim to 1 page'})` });
+      if (kwScore >= 70)
+        issues.push({ t: 'ok', m: `✅ Good keyword match (${kwScore}%) for target role` });
+      if (verbsFound.length >= 5)
+        issues.push({ t: 'ok', m: `✅ Strong action verbs: ${verbsFound.slice(0, 5).join(', ')}` });
+      if (hasEmail && hasPhone)
+        issues.push({ t: 'ok', m: '✅ Contact information complete' });
+
+      const grade = total >= 80 ? 'A' : total >= 65 ? 'B' : total >= 50 ? 'C' : 'D';
+      const gColor = total >= 80 ? 'var(--t)' : total >= 65 ? 'var(--y)' : total >= 50 ? 'var(--o)' : 'var(--p)';
+      const verdict = total >= 80 ? 'ATS Ready ✅' : total >= 65 ? 'Good — Minor Fixes ⚠️' : total >= 50 ? 'Needs Work ❌' : 'Poor — Rewrite ❌';
+
+      const catBars = cats.map(c => `
+    <div class="ats-cat">
+      <span class="ats-cat-l">${c.l} <span style="color:var(--dim);font-size:.7rem">(${c.w})</span></span>
+      <div class="ats-cat-tr"><div class="ats-cat-f" data-w="${c.v}" style="background:${c.v >= 70 ? 'var(--t)' : c.v >= 50 ? 'var(--y)' : 'var(--p)'}"></div></div>
+      <span class="ats-cat-v">${c.v}%</span>
+    </div>`).join('');
+
+      const issuHTML = issues.map(i => `<div class="ats-issue ${i.t}">${i.m}</div>`).join('');
+
+      const kwFoundHTML = foundKW.slice(0, 20).map(k => `<span class="ats-kw-found">✓ ${k}</span>`).join('');
+      const kwMissHTML = missingKW.slice(0, 15).map(k => `<span class="ats-kw-miss">${k}</span>`).join('');
+
+      const el = document.getElementById('ats-r-box');
+      el.className = 'rbox show';
+      el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;margin-bottom:1rem">
+      <div>
+        <div class="rv" style="color:${gColor};font-size:2rem">${total}/100 — Grade ${grade}</div>
+        <div class="rmeta">${verdict} · ${wordCount} words · ${foundSections.length}/${SECTIONS.length} sections detected</div>
+      </div>
+    </div>
+    <div class="ats-cats">${catBars}</div>
+    ${jd ? `<div style="margin-top:.8rem">
+      <div style="font-family:var(--mono);font-size:.62rem;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Keyword Analysis (${foundKW.length}/${jdWords.length} JD keywords found)</div>
+      <div class="ats-kw">${kwFoundHTML}${kwMissHTML}</div>
+    </div>`: ''}
+    <div style="margin-top:.8rem">
+      <div style="font-family:var(--mono);font-size:.62rem;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Issues & Recommendations</div>
+      <div class="ats-issues">${issuHTML}</div>
+    </div>
+    <div style="margin-top:.7rem;font-family:var(--mono);font-size:.68rem;color:var(--dim)">
+      Sections found: <span style="color:var(--t)">${foundSections.join(', ') || 'none'}</span><br/>
+      Action verbs: <span style="color:var(--t)">${verbsFound.join(', ') || 'none found'}</span>
+    </div>`;
+      animDataW();
+    }
+  </script>
+</body>
+
+</html>
